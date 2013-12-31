@@ -7,11 +7,13 @@ typedef enum excom_factory_worker_status {
   EXCOM_FACTORY_WORKER_TERM
 } excom_factory_worker_status_t;
 
+typedef void* (excom_factory_job_runner_t)(void*);
+
 typedef struct excom_factory_job {
-  void* (*runner)(struct excom_factory_job*, void*);
+  excom_factory_job_runner_t* runner;
   void* data;
-  struct job* prev;
-  struct job* next;
+  struct excom_factory_job* prev;
+  struct excom_factory_job* next;
 } excom_factory_job_t;
 
 typedef struct excom_factory_worker {
@@ -31,6 +33,6 @@ typedef struct excom_factory {
   } job;
 } excom_factory_t;
 
-int excom_factory_init(excom_factory_t* factory, int workers);
+int excom_factory_init(excom_factory_t* factory, uint8_t workers);
 
 #endif

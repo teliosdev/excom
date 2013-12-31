@@ -52,21 +52,21 @@ int excom_thread_create(
 #endif
 }
 
-int excom_mutex_lock(excom_mutex_t* mutex)
+void excom_thread_exit()
 {
 #ifdef EXCOM_POSIX
-  return pthread_mutex_lock(mutex);
+  pthread_exit(NULL);
 #else
-  return !(WaitForSingleObject(*mutex, INFINITE) == WAIT_OBJECT_0);
+  ExitThread(0);
 #endif
 }
 
-int excom_mutex_unlock(excom_mutex_t* mutex)
+int excom_thread_join(excom_thread_t* thread)
 {
 #ifdef EXCOM_POSIX
-  return pthread_mutex_unlock(mutex);
+  return pthread_join(thread->thread, NULL);
 #else
-  if(ReleaseMutex(*mutex) == 0)
+  if(WaitForSingleObject(thread->thread, INFINITE) == WAIT_FAILED)
   {
     return GetLastError();
   }
@@ -77,3 +77,58 @@ int excom_mutex_unlock(excom_mutex_t* mutex)
 #endif
 }
 
+int excom_mutex_lock(excom_mutex_t* mutex)
+{
+#ifdef EXCOM_POSIX
+  return pthread_mutex_lock(mutex);
+#else
+  EnterCriticalSection(mutex);
+  return 0;
+#endif
+}
+
+int excom_mutex_unlock(excom_mutex_t* mutex)
+{
+#ifdef EXCOM_POSIX
+  return pthread_mutex_unlock(mutex);
+#else
+  LeaveCriticalSection(mutex);
+  return 0;
+#endif
+}
+
+int excom_cond_wait(excom_cond_t* cond, excom_mutex_t* mutex)
+{
+#ifdef EXCOM_POSIX
+  return pthread_cond_wait(cond, mutex);
+#else
+  if(SleepConditionVariableCS(cond, mutex))
+  {
+    return 0;
+  }
+  else
+  {
+    return GetLastError();
+  }
+#endif
+}
+
+int excom_cond_signal(excom_cond_t* cond)
+{
+#ifdef EXCOM_POSIX
+  return pthread_cond_signal(cond);
+#else
+  WakeConditionVariable(cond);
+  return 0;
+#endif
+}
+
+int excom_cond_broadcast(excom_cond_t* cond)
+{
+#ifdef EXCOM_POSIX
+  return pthread_cond_broadcast(cond);
+#else
+  WakeAllConditionVariable(cond);
+  return 0;
+#endif
+}

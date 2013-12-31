@@ -37,7 +37,18 @@ int excom_thread_create(
   excom_thread_proc_t* proc,
   void* arg);
 
+void excom_thread_exit();
+
+/*!
+* @returns An error code.
+*/
+int excom_thread_join(excom_thread_t* thread);
+
 int excom_mutex_lock(excom_mutex_t* mutex);
 int excom_mutex_unlock(excom_mutex_t* mutex);
+int excom_cond_wait(excom_cond_t* cond, excom_mutex_t* mutex);
+
+int excom_cond_broadcast(excom_cond_t* cond);
+int excom_cond_signal(excom_cond_t* cond);
 
 #endif

@@ -1,4 +1,3 @@
-
 PACKET(
   protocol_version,
   0x01,
@@ -6,3 +5,4 @@ PACKET(
     string(version)
   }
 );
+
