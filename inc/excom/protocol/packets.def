@@ -1,0 +1,8 @@
+
+PACKET(
+  protocol_version,
+  0x01,
+  {
+    string(version)
+  }
+);
