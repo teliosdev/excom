@@ -27,7 +27,7 @@ typedef void* (excom_thread_proc_t)(void*);
 typedef struct excom_thread_data {
   void* arg;
   excom_thread_proc_t* proc;
-  excom_thread_t* thread;
+  struct excom_thread* thread;
 } excom_thread_data_t;
 
 #ifdef EXCOM_POSIX
@@ -41,8 +41,10 @@ typedef struct excom_thread_data {
  * excom library. MUST BE CALLED BEFORE ANY OTHER THREADING FUNCTIONS
  * ARE CALLED.  This helps each thread keep track of who they are,
  * and what their return values should be.
+ *
+ * @returns An error, if it occured; 0 otherwise.
  */
-void excom_thread_load();
+int excom_thread_load();
 
 /*!
  * Creates a thread, and returns the type to identify it.  This

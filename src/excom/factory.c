@@ -96,7 +96,7 @@ int excom_factory_init(excom_factory_t* factory, uint8_t workers)
     worker->err     = 0;
     memset(&worker->thread, 0, sizeof(worker->thread));
 
-    err = excom_thread_create(&worker->thread, excom_factory_work,
+    err = excom_thread_init(&worker->thread, excom_factory_work,
       worker);
 
     if(err != 0)
@@ -128,7 +128,7 @@ void excom_factory_destroy(excom_factory_t* factory)
 
   for(i = 0; i < factory->num; i++)
   {
-    excom_thread_join(&factory->workers[i].thread);
+    excom_thread_join(&factory->workers[i].thread, NULL);
   }
 
   free(factory->workers);

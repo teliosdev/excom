@@ -20,12 +20,12 @@ DWORD WINAPI excom_thread_wrapper(void* arg)
 #endif
 }
 
-int excom_thread_init()
+int excom_thread_load()
 {
-  excom_tls_key_init(&local_data);
+  return excom_tls_key_init(&local_data);
 }
 
-int excom_thread_create(
+int excom_thread_init(
   excom_thread_t* thread,
   excom_thread_proc_t* proc,
   void* arg)
@@ -156,7 +156,7 @@ int excom_cond_broadcast(excom_cond_t* cond)
 int excom_tls_key_init(excom_tls_key_t* key)
 {
 #ifdef EXCOM_POSIX
-  return pthread_key_create(key);
+  return pthread_key_create(key, NULL);
 #else
   key[0] = TlsAlloc();
   if(key[0] == TLS_OUT_OF_INDEXES)
