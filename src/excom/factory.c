@@ -9,11 +9,12 @@
   (item)->prev = (item)->next = NULL;                           \
 } while(0)
 
-#define PUSH(item, list) do \
-{                           \
-  (item)->prev = NULL;      \
-  (item)->next = (list);    \
-  (list) = (item);          \
+#define PUSH(item, list) do    \
+{                              \
+  (item)->prev = NULL;         \
+  (item)->next = (list);       \
+  (item)->next->prev = (list); \
+  (list) = (item);             \
 } while(0)
 
 static void* excom_factory_work(void* ptr)
