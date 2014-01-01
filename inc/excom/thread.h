@@ -24,46 +24,60 @@
  */
 typedef void* (excom_thread_proc_t)(void*);
 
+typedef struct excom_thread_data {
+  void* arg;
+  excom_thread_proc_t* proc;
+  excom_thread_t* thread;
+} excom_thread_data_t;
+
 #ifdef EXCOM_POSIX
 #  include "excom/thread/posix.h"
 #else
 #  include "excom/thread/windows.h"
 #endif
 
-/*
- * Thread procs must be defined as such:
- *
- *   EXCOM_THREAD_PROC some_thread_func(void* arg)
- *
- * This is to maintain compatibility between platforms.  They must
- * also return the value EXCOM_THREAD_RETURN, for the same reason.
- * If these are not met, compilers will scream, the Earth will open,
- * and the Third Impact will occur.
+/*!
+ * Performs the required operations to start the threading for the
+ * excom library. MUST BE CALLED BEFORE ANY OTHER THREADING FUNCTIONS
+ * ARE CALLED.  This helps each thread keep track of who they are,
+ * and what their return values should be.
  */
+void excom_thread_load();
 
 /*!
- * Creates a thread, and returns the type to identify it.  This type,
- * depending on the platform, could either be a pthread_t or a struct;
- * therefore, my advice is, don't rely on it being one thing or
- * another.
+ * Creates a thread, and returns the type to identify it.  This
+ * information such as platform-specific information to keep track of
+ * the thread, and the return value of the thread.
  *
+ * @param [out] thread The place to store the thread information.
+ *   This can be on the stack as long as the stack exists for the
+ *   duration of the thread.
  * @param [in] proc The function that will be executed on thread
  *   start.
  * @param [in] arg The argument that will be passed to the function
  *   that starts in the thread.
- * @returns An excom_thread_t to describe the thread.
+ * @returns An error, if it occured; 0 otherwise.
  */
-int excom_thread_create(
+int excom_thread_init(
   excom_thread_t* thread,
   excom_thread_proc_t* proc,
   void* arg);
 
-void excom_thread_exit();
+/*!
+ * Exists the current thread, with the given return value.  If called
+ * in the main thread, discards the return value, but otherwise exits
+ * main thread, as well.
+ *
+ * @param [in] retval The return value of the thread.
+ */
+void excom_thread_exit(void* retval);
 
 /*!
 * @returns An error code.
 */
 int excom_thread_join(excom_thread_t* thread, void** result);
+
+excom_thread_t* excom_thread_current();
 
 int excom_mutex_lock(excom_mutex_t* mutex);
 int excom_mutex_unlock(excom_mutex_t* mutex);
@@ -71,5 +85,9 @@ int excom_cond_wait(excom_cond_t* cond, excom_mutex_t* mutex);
 
 int excom_cond_broadcast(excom_cond_t* cond);
 int excom_cond_signal(excom_cond_t* cond);
+
+int excom_tls_key_init(excom_tls_key_t* key);
+void* excom_tls_get(excom_tls_key_t key);
+int excom_tls_set(excom_tls_key_t key, void* value);
 
 #endif

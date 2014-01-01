@@ -1,10 +1,6 @@
 #include "excom.h"
 
-struct thread_data {
-  void* arg;
-  excom_thread_proc_t* proc;
-  excom_thread_t* thread;
-};
+excom_tls_key_t local_data;
 
 #ifdef EXCOM_POSIX
 void* excom_thread_wrapper(void* arg)
@@ -12,11 +8,10 @@ void* excom_thread_wrapper(void* arg)
 DWORD WINAPI excom_thread_wrapper(void* arg)
 #endif
 {
-  struct thread_data* thread_data = (struct thread_data*) arg;
+  excom_thread_data_t* data = (excom_thread_data_t*) arg;
+  excom_tls_set(local_data, data);
 
-  thread_data->thread->ret = (*thread_data->proc)(thread_data->arg);
-
-  free(thread_data);
+  data->thread->ret = (*data->proc)(data->arg);
 
 #ifdef EXCOM_POSIX
   return NULL;
@@ -25,15 +20,20 @@ DWORD WINAPI excom_thread_wrapper(void* arg)
 #endif
 }
 
+int excom_thread_init()
+{
+  excom_tls_key_init(&local_data);
+}
+
 int excom_thread_create(
   excom_thread_t* thread,
   excom_thread_proc_t* proc,
   void* arg)
 {
-  struct thread_data* data;
+  excom_thread_data_t* data;
   thread->ret = NULL;
 
-  data = malloc(sizeof(struct thread_data));
+  data = malloc(sizeof(excom_thread_data_t));
 
   data->arg    = arg;
   data->proc   = proc;
@@ -52,8 +52,15 @@ int excom_thread_create(
 #endif
 }
 
-void excom_thread_exit()
+void excom_thread_exit(void* retval)
 {
+  excom_thread_data_t* d = excom_tls_get(local_data);
+
+  if(d != NULL)
+  {
+    d->thread->ret = retval;
+  }
+
 #ifdef EXCOM_POSIX
   pthread_exit(NULL);
 #else
@@ -83,6 +90,11 @@ int excom_thread_join(excom_thread_t* thread, void** result)
     result[0] = thread->ret;
   }
   return out;
+}
+
+excom_thread_t* excom_thread_current()
+{
+  return (excom_thread_t*) excom_tls_get(local_data);
 }
 
 int excom_mutex_lock(excom_mutex_t* mutex)
@@ -138,5 +150,47 @@ int excom_cond_broadcast(excom_cond_t* cond)
 #else
   WakeAllConditionVariable(cond);
   return 0;
+#endif
+}
+
+int excom_tls_key_init(excom_tls_key_t* key)
+{
+#ifdef EXCOM_POSIX
+  return pthread_key_create(key);
+#else
+  key[0] = TlsAlloc();
+  if(key[0] == TLS_OUT_OF_INDEXES)
+  {
+    return GetLastError();
+  }
+  else
+  {
+    return 0;
+  }
+#endif
+}
+
+void* excom_tls_get(excom_tls_key_t key)
+{
+#ifdef EXCOM_POSIX
+  return pthread_getspecific(key);
+#else
+  return TlsGetValue(key);
+#endif
+}
+
+int excom_tls_set(excom_tls_key_t key, void* value)
+{
+#ifdef EXCOM_POSIX
+  return pthread_setspecific(key, value);
+#else
+  if(TlsSetValue(key, value) == FALSE)
+  {
+    return GetLastError();
+  }
+  else
+  {
+    return 0;
+  }
 #endif
 }

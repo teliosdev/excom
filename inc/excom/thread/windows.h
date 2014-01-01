@@ -12,6 +12,8 @@ typedef CRITICAL_SECTION excom_mutex_t;
 
 typedef CONDITION_VARIABLE excom_cond_t;
 
+typedef DWORD excom_tls_key_t;
+
 #define EXCOM_THREAD_RETURN 0
 
 #define excom_cond_init(cond) (InitializeConditionVariable(&cond))
