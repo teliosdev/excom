@@ -2,11 +2,14 @@
 
 #include <stdio.h>
 #include <errno.h>
-#include <unistd.h>
-#include <sys/types.h>
-#include <sys/socket.h>
-#include <netinet/in.h>
-#include <netdb.h>
+
+#ifdef EXCOM_POSIX
+#  include <sys/types.h>
+#  include <sys/socket.h>
+#  include <netinet/in.h>
+#  include <netdb.h>
+#endif
+
 #include <fcntl.h>
 
 /*!
@@ -35,7 +38,7 @@ int excom_server_bind(excom_server_t* server)
 {
   bool val = true;
   int err, flags;
-  socklen_t len = sizeof(bool);
+  size_t len = sizeof(bool);
   struct sockaddr_in name;
   unsigned long param;
 
@@ -65,12 +68,11 @@ int excom_server_bind(excom_server_t* server)
   err = fcntl(server->sock, F_SETFL, flags);
   ERROR_CHECK(err);
 
-  evthread_use_pthreads();
 #else
   param = 1;
+  (void) flags;
 
   ioctlsocket(server->sock, FIONBIO, &param);
-  evthread_use_windows_threads();
 #endif
 
   return 0;
@@ -78,16 +80,9 @@ int excom_server_bind(excom_server_t* server)
 
 int excom_server_run(excom_server_t* server)
 {
-  struct event_base* base;
   int err;
   (void) server;
-
-  base = event_base_new();
-
-  if(base == NULL)
-  {
-    ERROR_CHECK(-1);
-  }
+  (void) err;
 
   return 0;
 }

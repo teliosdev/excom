@@ -1,6 +1,27 @@
 #ifndef _EXCOM_THREAD_H
 #define _EXCOM_THREAD_H
 
+/*!
+ * @file "excom/thread.h"
+ * Defines types and headers that are used to interface the excom
+ * threading API.  The threading API implements threads, mutexes,
+ * and conditional variables; it provides a platform-independent
+ * interface, but uses the platform's implementation details under
+ * the cover.
+ *
+ * As far as this library is concerned, there are only two types of
+ * platforms: those who implement pthreads, and windows platforms.
+ * As such, it'll check for either platform and then include the
+ * correct files.
+ */
+
+/*!
+ * A callback for when a new thread is created.  The callback accepts
+ * one argument, which can be a pointer to anything (although I don't
+ * recommend making it a pointer to anything on the stack).  It can
+ * return a pointer to anything, which can be retrieved on the call to
+ * excom_thread_join.
+ */
 typedef void* (excom_thread_proc_t)(void*);
 
 #ifdef EXCOM_POSIX
@@ -42,7 +63,7 @@ void excom_thread_exit();
 /*!
 * @returns An error code.
 */
-int excom_thread_join(excom_thread_t* thread);
+int excom_thread_join(excom_thread_t* thread, void** result);
 
 int excom_mutex_lock(excom_mutex_t* mutex);
 int excom_mutex_unlock(excom_mutex_t* mutex);

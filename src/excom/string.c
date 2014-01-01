@@ -2,13 +2,13 @@
 #include <string.h>
 #include <errno.h>
 
-inline void excom_string_init(excom_string_t* string)
+void excom_string_init(excom_string_t* string)
 {
   string->size = 0;
   string->body = NULL;
 }
 
-inline void excom_string_fill(excom_string_t* string, uint32_t size,
+void excom_string_fill(excom_string_t* string, uint32_t size,
   char* body)
 {
   string->size = size;

@@ -22,7 +22,7 @@ static void* excom_factory_work(void* ptr)
   excom_factory_worker_t* worker = (excom_factory_worker_t*) ptr;
   excom_factory_job_t* job;
 
-  while(true)
+  while(TRUE)
   {
     excom_mutex_lock(&worker->factory->job.mutex);
     excom_cond_wait(&worker->factory->job.cond, &worker->factory->job.mutex);

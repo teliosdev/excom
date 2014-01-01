@@ -1,6 +1,8 @@
 #ifndef _EXCOM_THREAD_WINDOWS_H
 #define _EXCOM_THREAD_WINDOWS_H
 
+#include <synchapi.h>
+
 typedef struct excom_thread {
   HANDLE thread;
   void* ret;

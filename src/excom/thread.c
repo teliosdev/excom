@@ -43,9 +43,9 @@ int excom_thread_create(
   return pthread_create((pthread_t*) &thread->thread, NULL,
     excom_thread_wrapper, data);
 #else
-  *(thread->thread) = CreateThread(NULL, 0,
+  thread->thread = CreateThread(NULL, 0,
     excom_thread_wrapper, data, 0, NULL);
-  if(*thread == NULL)
+  if(thread->thread == NULL)
   {
     return GetLastError();
   }
@@ -61,20 +61,28 @@ void excom_thread_exit()
 #endif
 }
 
-int excom_thread_join(excom_thread_t* thread)
+int excom_thread_join(excom_thread_t* thread, void** result)
 {
+  int out;
 #ifdef EXCOM_POSIX
-  return pthread_join(thread->thread, NULL);
+  out = pthread_join(thread->thread, NULL);
 #else
   if(WaitForSingleObject(thread->thread, INFINITE) == WAIT_FAILED)
   {
-    return GetLastError();
+    out = GetLastError();
   }
   else
   {
-    return 0;
+    out = 0;
   }
+
 #endif
+
+  if(result != NULL)
+  {
+    result[0] = thread->ret;
+  }
+  return out;
 }
 
 int excom_mutex_lock(excom_mutex_t* mutex)
@@ -102,7 +110,7 @@ int excom_cond_wait(excom_cond_t* cond, excom_mutex_t* mutex)
 #ifdef EXCOM_POSIX
   return pthread_cond_wait(cond, mutex);
 #else
-  if(SleepConditionVariableCS(cond, mutex))
+  if(SleepConditionVariableCS(cond, mutex, INFINITE))
   {
     return 0;
   }
