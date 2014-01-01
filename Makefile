@@ -2,7 +2,7 @@
 CFILES :=
 OBJS   :=
 CFLAGS += -std=c99 -g3 -Wall -Wextra -fPIC -iquote$(CURDIR)/inc
-LDFLAGS+= -L$(CURDIR) -ltcmalloc -levent -pthread
+LDFLAGS+= -L$(CURDIR) -pthread
 
 include src/local.mk
 OBJS += $(patsubst %.c,%.o, $(CFILES))
