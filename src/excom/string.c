@@ -2,6 +2,9 @@
 #include <string.h>
 #include <errno.h>
 
+// TODO: excom_string_fill copies memory over,
+// excom_string_fill_no_copy doesn't
+
 void excom_string_init(excom_string_t* string)
 {
   string->size = 0;

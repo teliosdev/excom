@@ -14,7 +14,4 @@ typedef pthread_key_t excom_tls_key_t;
 
 #define EXCOM_THREAD_RETURN NULL
 
-#define excom_cond_init(cond) (pthread_cond_init(&cond, NULL))
-#define excom_mutex_init(mutex) (pthread_mutex_init(&mutex, NULL))
-
 #endif

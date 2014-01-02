@@ -65,8 +65,8 @@ int excom_factory_init(excom_factory_t* factory, uint8_t workers)
     return EINVAL;
   }
 
-  excom_cond_init(factory->job.cond);
-  excom_mutex_init(factory->job.mutex);
+  excom_cond_init(&factory->job.cond);
+  excom_mutex_init(&factory->job.mutex);
 
   if(errno > 0)
   {

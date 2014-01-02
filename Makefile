@@ -11,7 +11,7 @@ OBJS += $(patsubst %.c,%.o, $(CFILES))
 .DEFAULT: default
 
 libexcom.a: $(OBJS) Makefile
-	$(AR) r $@ $^
+	$(AR) r $@ $(patsubst Makefile,,$^)
 
 default: libexcom.a
 

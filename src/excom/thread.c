@@ -87,7 +87,7 @@ int excom_thread_join(excom_thread_t* thread, void** result)
 
   if(result != NULL)
   {
-    result[0] = thread->ret;
+    *result = thread->ret;
   }
   return out;
 }
@@ -95,6 +95,16 @@ int excom_thread_join(excom_thread_t* thread, void** result)
 excom_thread_t* excom_thread_current()
 {
   return (excom_thread_t*) excom_tls_get(local_data);
+}
+
+int excom_mutex_init(excom_mutex_t* mutex)
+{
+#ifdef EXCOM_POSIX
+  return pthread_mutex_init(mutex, NULL);
+#else
+  InitializeCriticalSection(mutex);
+  return 0;
+#endif
 }
 
 int excom_mutex_lock(excom_mutex_t* mutex)
@@ -113,6 +123,16 @@ int excom_mutex_unlock(excom_mutex_t* mutex)
   return pthread_mutex_unlock(mutex);
 #else
   LeaveCriticalSection(mutex);
+  return 0;
+#endif
+}
+
+int excom_cond_init(excom_cond_t* cond)
+{
+#ifdef EXCOM_POSIX
+  return pthread_cond_init(cond, NULL);
+#else
+  InitializeConditionVariable(cond);
   return 0;
 #endif
 }
@@ -158,8 +178,8 @@ int excom_tls_key_init(excom_tls_key_t* key)
 #ifdef EXCOM_POSIX
   return pthread_key_create(key, NULL);
 #else
-  key[0] = TlsAlloc();
-  if(key[0] == TLS_OUT_OF_INDEXES)
+  *key = TlsAlloc();
+  if(*key == TLS_OUT_OF_INDEXES)
   {
     return GetLastError();
   }

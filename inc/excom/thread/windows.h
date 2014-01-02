@@ -16,7 +16,4 @@ typedef DWORD excom_tls_key_t;
 
 #define EXCOM_THREAD_RETURN 0
 
-#define excom_cond_init(cond) (InitializeConditionVariable(&cond))
-#define excom_mutex_init(mutex) (InitializeCriticalSection(&mutex))
-
 #endif
