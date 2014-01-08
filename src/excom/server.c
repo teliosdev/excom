@@ -20,7 +20,7 @@
 
 void excom_server_init(excom_server_t* server)
 {
-  server->sock = 0;
+  server->sock = -1;
   server->addr = EXCOM_DEFAULT_ADDR;
   server->port = EXCOM_DEFAULT_PORT;
 }
@@ -34,6 +34,7 @@ void excom_server_init(excom_server_t* server)
     return err;               \
   }                           \
 } while(0)
+
 int excom_server_bind(excom_server_t* server)
 {
   bool val = true;

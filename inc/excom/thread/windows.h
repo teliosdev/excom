@@ -3,6 +3,8 @@
 
 #include <synchapi.h>
 
+/*!
+*/
 typedef struct excom_thread {
   HANDLE thread;
   void* ret;
@@ -13,7 +15,5 @@ typedef CRITICAL_SECTION excom_mutex_t;
 typedef CONDITION_VARIABLE excom_cond_t;
 
 typedef DWORD excom_tls_key_t;
-
-#define EXCOM_THREAD_RETURN 0
 
 #endif

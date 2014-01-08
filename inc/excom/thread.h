@@ -35,7 +35,7 @@
  * one argument, which can be a pointer to anything (although I don't
  * recommend making it a pointer to anything on the stack).  It can
  * return a pointer to anything, which can be retrieved on the call to
- * excom_thread_join.
+ * excom_thread_join().
  */
 typedef void* (excom_thread_proc_t)(void*);
 
@@ -65,18 +65,66 @@ typedef struct excom_thread_data {
 
 #ifdef EXCOM_POSIX
 #  include "excom/thread/posix.h"
-#else
+#elif defined(EXCOM_WIN)
 #  include "excom/thread/windows.h"
+#endif
+
+#ifdef DOXYGEN
+
+/*!
+ * Contains information about the thread.  This can be used to
+ * identify a thread.
+ *
+ * @ingroup threading
+ */
+typedef struct excom_thread {
+
+  /*!
+   * A platform-specific identifier for the thread.
+   */
+  void thread;
+
+  /*!
+   * The return value of the thread.  This is returned by
+   * excom_thread_join().  It should never be accessed directly.
+   */
+  void* ret;
+} excom_thread_t;
+
+/*!
+ * Typedefs the platform-specific type for mutexes to our
+ * platform-independent type.
+ *
+ * @ingroup mutex
+ */
+typedef void excom_mutex_t;
+
+/*!
+ * Typedefs the platform-specific type for conditional variables to
+ * our platform-independent type.
+ *
+ * @ingroup condvar
+ */
+typedef void excom_cond_t;
+
+/*!
+ * Typedefs the platform-specific type for Thread-Local Storage keys
+ * to our platform-independent type.
+ *
+ * @ingroup tls
+ */
+typedef void excom_tls_key_t;
+
 #endif
 
 /*!
  * Performs the required operations to start the threading for the
- * excom library. MUST BE CALLED BEFORE ANY OTHER THREADING FUNCTIONS
- * ARE CALLED.  This helps each thread keep track of who they are,
- * and what their return values should be.
+ * excom library. **MUST BE CALLED BEFORE ANY OTHER THREADING
+ * FUNCTIONS ARE CALLED**.  This helps each thread keep track of who
+ * they are, and what their return values should be.
  *
  * @ingroup threading
- * @returns An error, if it occured; 0 otherwise.
+ * @returns An error code, or `0` if there was none.
  */
 int excom_thread_load();
 
@@ -93,7 +141,7 @@ int excom_thread_load();
  *   start.
  * @param [in]  arg    The argument that will be passed to the
  *   function that starts in the thread.
- * @returns An error, if it occured; 0 otherwise.
+ * @returns An error code, or `0` if there was none.
  */
 int excom_thread_init(
   excom_thread_t* thread,
@@ -122,7 +170,7 @@ void excom_thread_exit(void* retval);
  * @param [out] result The place to put the result of the thread.  If
  *   this is non-null, the result of the thread will be stored there;
  *   otherwise, it is ignored.
- * @returns An error code, if an error occured; 0 otherwise.
+ * @returns An error code, or `0` if there was none.
  */
 int excom_thread_join(excom_thread_t* thread, void** result);
 
@@ -143,7 +191,7 @@ excom_thread_t* excom_thread_current();
  *
  * @ingroup mutex
  * @param [out] mutex The mutex to initialize.
- * @returns An error code, or 0 if there is none.
+ * @returns An error code, or `0` if there was none.
  */
 int excom_mutex_init(excom_mutex_t* mutex);
 
@@ -153,7 +201,7 @@ int excom_mutex_init(excom_mutex_t* mutex);
  *
  * @ingroup mutex
  * @param [in] mutex The mutex to lock.
- * @returns An error code, or 0 if there is none.
+ * @returns An error code, or `0` if there was none.
  */
 int excom_mutex_lock(excom_mutex_t* mutex);
 
@@ -163,7 +211,7 @@ int excom_mutex_lock(excom_mutex_t* mutex);
  *
  * @ingroup mutex
  * @param [in] mutex The mutex to unlock.
- * @returns An error code, or 0 if there is none.
+ * @returns An error code, or `0` if there was none.
  */
 int excom_mutex_unlock(excom_mutex_t* mutex);
 
@@ -173,7 +221,7 @@ int excom_mutex_unlock(excom_mutex_t* mutex);
  *
  * @ingroup condvar
  * @param [out] cond The place to store condition variable.
- * @returns An error code, or 0 if there is none.
+ * @returns An error code, or `0` if there was none.
  */
 int excom_cond_init(excom_cond_t* cond);
 
@@ -185,7 +233,7 @@ int excom_cond_init(excom_cond_t* cond);
  * @ingroup mutex condvar
  * @param [in] cond  The condition variable to wait on.
  * @param [in] mutex The mutex to lock and unlock.
- * @returns An error code, or 0 if there is none.
+ * @returns An error code, or `0` if there was none.
  */
 int excom_cond_wait(excom_cond_t* cond, excom_mutex_t* mutex);
 
@@ -195,7 +243,7 @@ int excom_cond_wait(excom_cond_t* cond, excom_mutex_t* mutex);
  *
  * @ingroup condvar
  * @param [in] cond The condition variable to broadcast on.
- * @returns An error code, or 0 if there is none.
+ * @returns An error code, or `0` if there was none.
  */
 int excom_cond_broadcast(excom_cond_t* cond);
 
@@ -204,7 +252,7 @@ int excom_cond_broadcast(excom_cond_t* cond);
  *
  * @ingroup condvar
  * @param [in] cond The condition variable to signal on.
- * @returns An error code, or 0 if there is none.
+ * @returns An error code, or `0` if there was none.
  */
 int excom_cond_signal(excom_cond_t* cond);
 
@@ -216,7 +264,7 @@ int excom_cond_signal(excom_cond_t* cond);
  *
  * @ingroup tls
  * @param [out] key The place to store the TLS key.
- * @returns An error code, or 0 if there is none.
+ * @returns An error code, or `0` if there was none.
  */
 int excom_tls_key_init(excom_tls_key_t* key);
 
@@ -236,7 +284,7 @@ void* excom_tls_get(excom_tls_key_t key);
  * @ingroup tls
  * @param [in] key   The key in the key-value pair.
  * @param [in] value The value to set in the key-value pair.
- * @returns An error code, or 0 if there is none.
+ * @returns An error code, or `0` if there was none.
  */
 int excom_tls_set(excom_tls_key_t key, void* value);
 

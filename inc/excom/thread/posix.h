@@ -12,6 +12,4 @@ typedef pthread_cond_t excom_cond_t;
 
 typedef pthread_key_t excom_tls_key_t;
 
-#define EXCOM_THREAD_RETURN NULL
-
 #endif
