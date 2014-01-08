@@ -5,6 +5,3 @@ compiler:
   - gcc
 
 script: make
-
-matrix:
-  fast_finish: true
