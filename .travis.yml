@@ -1,0 +1,10 @@
+language: C
+
+compiler:
+  - clang
+  - gcc
+
+script: make
+
+matrix:
+  fast_finish: true
