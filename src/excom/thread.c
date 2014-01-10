@@ -13,6 +13,9 @@ DWORD WINAPI excom_thread_wrapper(void* arg)
 
   data->thread->ret = (*data->proc)(data->arg);
 
+  excom_tls_set(local_data, NULL);
+  excom_free(data);
+
 #ifdef EXCOM_POSIX
   return NULL;
 #else
@@ -33,7 +36,7 @@ int excom_thread_init(
   excom_thread_data_t* data;
   thread->ret = NULL;
 
-  data = malloc(sizeof(excom_thread_data_t));
+  data = excom_malloc(sizeof(excom_thread_data_t));
 
   data->arg    = arg;
   data->proc   = proc;

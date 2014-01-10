@@ -17,7 +17,14 @@
 #  error Unsupported platform.
 #endif
 
-#include <stdbool.h>
+#ifndef EXCOM_NO_STDBOOL
+#  include <stdbool.h>
+#else
+#  define bool int
+#  define true 1
+#  define false 0
+#endif
+
 #include <stdlib.h>
 #include <stdint.h>
 #include <string.h>
@@ -26,11 +33,10 @@
 
 #include "excom/string.h"
 #include "excom/protocol.h"
-#include "excom/server.h"
 #include "excom/thread.h"
 #include "excom/factory.h"
 #include "excom/event.h"
-
+#include "excom/server.h"
 
 #define excom_malloc malloc
 #define excom_calloc calloc
@@ -43,11 +49,18 @@
   if(err)                                    \
   {                                          \
     buf = strerror(err);                     \
-    fprintf("[excom] error: " #desc          \
+    fprintf(stderr, "[excom] error: " desc   \
       ": %s\n", buf);                        \
     if(failcode)                             \
       exit(failcode);                        \
   }                                          \
+} while(0)
+
+#define excom_return_errno() do { \
+  int err;                        \
+  err = errno;                    \
+  errno = 0;                      \
+  return err;                     \
 } while(0)
 
 #endif

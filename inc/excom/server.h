@@ -56,6 +56,8 @@ typedef struct excom_server {
    * `EXCOM_DEFAULT_ADDR` for more information.
    */
   uint32_t addr;
+
+  struct excom_event_base base;
 } excom_server_t;
 
 /*!

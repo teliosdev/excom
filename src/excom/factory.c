@@ -46,7 +46,7 @@ static void* excom_factory_work(void* ptr)
 
     (*job->runner)(job->data);
 
-    free(job);
+    excom_free(job);
   }
 
   excom_thread_exit(NULL);
@@ -70,10 +70,7 @@ int excom_factory_init(excom_factory_t* factory, uint8_t workers)
 
   if(errno > 0)
   {
-    err = errno;
-    errno = 0;
-
-    return err;
+    excom_return_errno();
   }
 
   factory->num = workers;
@@ -82,10 +79,7 @@ int excom_factory_init(excom_factory_t* factory, uint8_t workers)
 
   if(factory->workers == NULL)
   {
-    err = errno;
-    errno = 0;
-
-    return err;
+    excom_return_errno();
   }
 
   for(i = 0; i < workers; i++)
@@ -131,7 +125,7 @@ void excom_factory_destroy(excom_factory_t* factory)
     excom_thread_join(&factory->workers[i].thread, NULL);
   }
 
-  free(factory->workers);
+  excom_free(factory->workers);
 }
 
 void excom_factory_add_job(excom_factory_t* factory,
@@ -139,7 +133,7 @@ void excom_factory_add_job(excom_factory_t* factory,
 {
   excom_factory_job_t* job;
 
-  job = malloc(sizeof(excom_factory_job_t));
+  job = excom_malloc(sizeof(excom_factory_job_t));
   job->runner = runner;
   job->data   = data;
 
