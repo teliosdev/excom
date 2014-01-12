@@ -91,7 +91,8 @@ int excom_server_bind(excom_server_t* server)
 static void _accept(excom_event_t event, excom_server_t* server)
 {
   int err;
-  excom_event_t new_event;
+  excom_event_t* new_event = excom_malloc(sizeof(excom_event_t));
+  excom_string_t str;
 
   while(1)
   {
@@ -106,18 +107,21 @@ static void _accept(excom_event_t event, excom_server_t* server)
       return;
     }
 
-    new_event.fd    = err;
-    new_event.flags = EXCOM_EVENT_READ | EXCOM_EVENT_WRITE |
-      EXCOM_EVENT_ERROR;
-    new_event.data  = NULL;
+    new_event->fd    = err;
+    new_event->flags = EXCOM_EVENT_READ | EXCOM_EVENT_WRITE |
+      EXCOM_EVENT_ERROR | EXCOM_EVENT_CLOSE;
+    new_event->data  = excom_malloc(sizeof(excom_event_buffer_t));
+    excom_string_fill(&str, 11, "hello world");
+    excom_string_unfreeable(&str);
+    excom_event_buffer_init2(new_event->data, &str);
     err = socket_non_blocking(err);
     if(err < 0)
     {
-      close(new_event.fd);
+      close(new_event->fd);
     }
     else
     {
-      excom_event_add(&server->base, &new_event);
+      excom_event_add(&server->base, new_event);
     }
   }
 }
@@ -126,6 +130,8 @@ static void on_event(excom_event_t event, void* ptr)
 {
   excom_server_t* server = (excom_server_t*) ptr;
   int err;
+  char buf[256];
+  excom_string_t str;
 
   // this is our listen socket!
   if(event.fd == server->sock)
@@ -137,7 +143,9 @@ static void on_event(excom_event_t event, void* ptr)
     }
     else if(event.flags & EXCOM_EVENT_ERROR)
     {
-      excom_check_error(EIO, 0, "Error on accept socket");
+      err = read(event.fd, NULL, 0);
+      if((err == 0) && (errno == 0)) errno = EIO;
+      excom_check_error(errno, 0, "Error on accept socket");
       excom_event_loop_end(&server->base);
       return;
     }
@@ -146,15 +154,38 @@ static void on_event(excom_event_t event, void* ptr)
   {
     if(event.flags & EXCOM_EVENT_READ)
     {
+      err = read(event.fd, buf, 256);
+      if(err < 0)
+      {
+        excom_check_error(errno, 0, "read");
+        close(event.fd);
+        return;
+      }
+      if(err > 3 && strncmp("stop", buf, 4) == 0)
+      {
+        excom_event_loop_end(&server->base);
+      }
+      else
+      {
+        excom_string_fill(&str, err, buf);
+        excom_string_unfreeable(&str);
+        excom_event_buffer_append(event.data, 1, &str);
+      }
       printf("Data available!\n");
     }
-    else if(event.flags & EXCOM_EVENT_WRITE)
+    if(event.flags & EXCOM_EVENT_WRITE)
     {
-      printf("Can write!\n");
+      excom_event_buffer_write(event.data, event.fd);
     }
-    else if(event.flags & EXCOM_EVENT_ERROR)
+    if(event.flags & EXCOM_EVENT_ERROR)
     {
-      printf("Error!\n");
+      printf("ERR!\n");
+    }
+    if(event.flags & EXCOM_EVENT_CLOSE)
+    {
+      close(event.fd);
+      excom_event_buffer_destroy(event.data);
+      excom_free(event.root);
     }
   }
 }
@@ -174,7 +205,8 @@ int excom_server_run(excom_server_t* server)
   }
 
   listen.fd    = server->sock;
-  listen.flags = EXCOM_EVENT_READ | EXCOM_EVENT_ERROR;
+  listen.flags = EXCOM_EVENT_READ | EXCOM_EVENT_ERROR |
+    EXCOM_EVENT_CLOSE;
   listen.data  = server;
 
   excom_event_add(&server->base, &listen);

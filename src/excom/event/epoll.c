@@ -24,7 +24,7 @@ int excom_event_add(excom_event_base_t* base,
   int err;
   struct epoll_event epevent;
 
-  epevent.events  = event->flags | EPOLLET;
+  epevent.events  = event->flags;
   epevent.data.ptr = event;
 
   err = epoll_ctl(base->epollfd, EPOLL_CTL_ADD, event->fd, &epevent);
@@ -71,6 +71,7 @@ void excom_event_loop(excom_event_base_t* base, void* ptr)
     for(i = 0; i < n; i++)
     {
       eptr = (excom_event_t*) events[i].data.ptr;
+      event.root  = eptr;
       event.fd    = eptr->fd;
       event.data  = eptr->data;
       event.flags = events[i].events;
