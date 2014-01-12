@@ -1,6 +1,8 @@
 #ifndef _EXCOM_SERVER_H
 #define _EXCOM_SERVER_H
 
+#include "excom/server/client.h"
+
 /*!
  * @file "excom/server.h"
  * Contains data types and functions related to how the server is set

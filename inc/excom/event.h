@@ -72,6 +72,9 @@ int excom_event_base_init(struct excom_event_base* base,
 int excom_event_add(struct excom_event_base* base,
   struct excom_event* event);
 
+int excom_event_remove(excom_event_base_t* base,
+  excom_event_t* event);
+
 void excom_event_loop(struct excom_event_base* base, void* ptr);
 
 void excom_event_loop_end(struct excom_event_base* base);
@@ -89,5 +92,8 @@ int excom_event_buffer_write(excom_event_buffer_t* buf,
   int sock);
 
 void excom_event_buffer_destroy(excom_event_buffer_t* buf);
+
+#define excom_event_client(event) \
+  ((excom_server_client_t*) (event)->data)
 
 #endif
