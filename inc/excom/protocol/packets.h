@@ -5,11 +5,11 @@
   typedef struct excom_protocol_##name body excom_protocol_##name##_t;
 
 #define string(name) excom_string_t name;
-#define int(type, name) type name;
+#define number(type, name) type name;
 
 #include "./packets.def"
 
-#undef int
+#undef number
 #undef string
 #undef PACKET
 

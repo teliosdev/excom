@@ -46,7 +46,7 @@ class PacketGenerator
     @packets.each do |packet|
       typedata = []
       packet.fields.each do |field|
-        typedata << "#{field[:type]}(#{field[:name]})"
+        typedata << "    #{field[:type]}(#{field[:arguments].join(', ')})"
       end
       typedata = typedata.join("\n").chomp
       outbuf <<
@@ -55,7 +55,7 @@ PACKET(
   #{packet.name},
   #{"0x%02x" % packet.id},
   {
-    #{typedata}
+#{typedata}
   }
 );
 
@@ -86,12 +86,7 @@ class Packet
       return super
     end
 
-    if arguments.size != 1
-      raise ArgumentError, "Wrong number of arguments " \
-        "(#{arguments.size} for 1)"
-    end
-
-    @fields << {type: method, name: arguments.first.to_sym}
+    @fields << {type: method, arguments: arguments}
   end
 
   def lock!

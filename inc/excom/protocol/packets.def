@@ -3,6 +3,9 @@ PACKET(
   0x01,
   {
     string(version)
+    number(int, major)
+    number(int, minor)
+    number(int, patch)
   }
 );
 
