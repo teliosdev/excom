@@ -114,7 +114,7 @@ static void _accept(excom_event_t event, excom_server_t* server)
     client->event.flags = EXCOM_EVENT_READ | EXCOM_EVENT_WRITE |
       EXCOM_EVENT_ERROR | EXCOM_EVENT_CLOSE;
     client->event.data  = client;
-    excom_string_fill(&str, 11, "hello world");
+    excom_string_fill(&str, 0, "");
     excom_string_unfreeable(&str);
     excom_event_buffer_init2(&client->outbuf, &str);
     err = socket_non_blocking(err);
@@ -124,6 +124,7 @@ static void _accept(excom_event_t event, excom_server_t* server)
     }
     else
     {
+      excom_server_client_connect(event, client);
       excom_event_add(&server->base, &client->event);
     }
   }

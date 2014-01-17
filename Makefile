@@ -30,3 +30,5 @@ inc/excom/protocol/packets.def: scripts/packets.rb scripts/packet_generator.rb
 
 %.o: %.c inc/*.h inc/*/*.h inc/*/*/*.h inc/excom/protocol/packets.def Makefile
 	$(CC) -o $@ $(CFLAGS) $(LDFLAGS) -c $<
+
+Makefile: src/local.mk src/*/local.mk src/**/local.mk

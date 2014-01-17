@@ -20,9 +20,9 @@ class PacketGenerator
       return super
     end
 
-    if arguments.size != 1
+    if ![1, 2].include?(arguments.size)
       raise ArgumentError, "Wrong number of arguments " \
-        "(#{arguments.size} for 1)"
+        "(#{arguments.size} for 1..2)"
     end
 
     packet = Packet.new

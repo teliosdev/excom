@@ -29,3 +29,19 @@ PACKET(
   }
 );
 
+PACKET(
+  command,
+  0x10,
+  {
+    string(command)
+  }
+);
+
+PACKET(
+  command_response,
+  0x11,
+  {
+    string(response)
+  }
+);
+

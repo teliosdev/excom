@@ -33,6 +33,11 @@ use them:
       <td>If this is defined, excom will use its own stdbool implementation.</td>
     </tr>
     <tr>
+      <td><code>EXCOM_INCLUDE_SERVER_CLIENT</code></td>
+      <td><i>none</i></td>
+      <td>If this is defined, excom will include a very basic implementation of a server that can handle reading and writing to clients.  It will not be able to handle anything more than that, though.</td>
+    </tr>
+    <tr>
       <td><code>EXCOM_EPOLL</code></td>
       <td><i>none</i></td>
       <td>If this is defined, excom will try to use epoll.  epoll <b>must</b> have support for <code>epoll_create1()</code>.</td>

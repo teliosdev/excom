@@ -4,8 +4,6 @@
 /*!
  * @file "excom/event.h"
  * Nothing here yet.
- *
- * Level-Triggered?  Level-Triggered.
  */
 
 typedef struct excom_event {
