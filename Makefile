@@ -12,12 +12,12 @@ BINOJBS += $(patsubst %.c,%.o, $(BINFILES))
 
 .PHONY: default clean
 
-default: excom
+default: excom.out
 
 libexcom.a: $(OBJS) Makefile
 	$(AR) r $@ $(patsubst Makefile,,$^)
 
-excom: libexcom.a $(BINOJBS)
+excom.out: libexcom.a $(BINOJBS)
 	$(CC) -o $@ $(CFLAGS) $(LDFLAGS) $(BINOJBS) -lexcom
 
 clean:
