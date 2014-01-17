@@ -28,5 +28,5 @@ inc/excom.h: inc/excom/protocol/packets.def
 inc/excom/protocol/packets.def: scripts/packets.rb scripts/packet_generator.rb
 	ruby scripts/packet_generator.rb scripts/packets.rb inc/excom/protocol/packets.def
 
-%.o: %.c inc/*.h inc/*/*.h inc/*/*/*.h Makefile
+%.o: %.c inc/*.h inc/*/*.h inc/*/*/*.h inc/excom/protocol/packets.def Makefile
 	$(CC) -o $@ $(CFLAGS) $(LDFLAGS) -c $<
