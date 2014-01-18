@@ -17,6 +17,10 @@
 #  error Unsupported platform.
 #endif
 
+#ifdef __APPLE__
+#  define EXCOM_MAC
+#endif
+
 #ifndef EXCOM_NO_STDBOOL
 #  include <stdbool.h>
 #else

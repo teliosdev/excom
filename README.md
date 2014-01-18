@@ -40,12 +40,12 @@ use them:
     <tr>
       <td><code>EXCOM_EPOLL</code></td>
       <td><i>none</i></td>
-      <td>If this is defined, excom will try to use epoll.  epoll <b>must</b> have support for <code>epoll_create1()</code>.</td>
+      <td>If this is defined, excom will try to use epoll.  epoll <b>must</b> have support for <kbd>epoll_create1()</kbd>.</td>
     </tr>
     <tr>
       <td><code>EXCOM_KQUEUE</code></td>
       <td><i>none</i></td>
-      <td>If this is defined, excom will try to use kqueue.  If it does not exist on the system, the compiler will error with <i>fatal error: sys/event.h: No such file or directory</i>. <i>Note: the support for kqueue in excom is still a little shakey, since I cannot test it in my current environment.</i></td>
+      <td>If this is defined, excom will try to use kqueue.  If it does not exist on the system, the compiler will error with <code>fatal error: sys/event.h: No such file or directory</code>. <i>Note: the support for kqueue in excom is still a little shakey, since I cannot test it in my current environment.</i></td>
     </tr>
   </tbody>
 </table>
@@ -73,7 +73,7 @@ But we're getting there!
 
 You wanna contribute?  Awesome!
 
-1. Fork it ( http://github.com/redjazz96/excom/fork )
+1. Fork it (<http://github.com/redjazz96/excom/fork>)
 2. Create your feature branch (`git checkout -b my-new-feature`)
 3. Commit your changes (`git commit -am 'Add some feature'`)
 4. Push to the branch (`git push origin my-new-feature`)

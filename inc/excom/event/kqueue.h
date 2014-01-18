@@ -5,7 +5,7 @@
 #include <sys/event.h>
 #include <sys/time.h>
 
-#ifdef EXCOM64
+#if defined(EXCOM64) && defined(EXCOM_MAC)
 #  define excom_kevent_t struct kevent64_s
 #  define excom_kevent kevent64
 #  define excom_kevent_set(a,b,c,d,e,f,i) EV_SET64(a,b,c,d,e,f,i,0,0)
