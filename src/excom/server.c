@@ -25,7 +25,7 @@ void excom_server_init(excom_server_t* server)
   server->port = EXCOM_DEFAULT_PORT;
 }
 
-#define ERROR_CHECK(value) do   \
+#define ERROR_CHECK(value) do \
 {                             \
   if(value < 0)               \
   {                           \

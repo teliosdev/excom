@@ -8,6 +8,8 @@ int excom_event_base_init(struct excom_event_base* base,
   base->loop     = true;
   base->kqueuefd = kqueue();
   base->runner   = runner;
+  base->maxevents = 32;
+  base->timeout   = 500;
 
   if(base->kqueuefd == -1)
   {
@@ -22,7 +24,7 @@ int excom_event_add(struct excom_event_base* base,
   excom_event_t* event)
 {
   int ret;
-  int16_t filter = 0;
+  short filter = 0;
   excom_kevent_t kev;
 
   if(event->flags & (EXCOM_EVENT_READ | EXCOM_EVENT_ERROR |
@@ -35,7 +37,7 @@ int excom_event_add(struct excom_event_base* base,
     filter |= EVFILT_WRITE;
   }
 
-  excom_kevent_set(&kev, event->fd, filter, EV_ADD, 0, 0, event);
+  excom_kevent_set(&kev, event->fd, filter, EV_ADD | EV_ENABLE, 0, 0, event);
 
   ret = excom_kevent(base->kqueuefd, &kev, 1, NULL, 0, NULL);
 
@@ -43,7 +45,7 @@ int excom_event_add(struct excom_event_base* base,
   {
     excom_return_errno();
   }
-  return -;
+  return 0;
 }
 
 int excom_event_remove(excom_event_base_t* base,
@@ -52,7 +54,7 @@ int excom_event_remove(excom_event_base_t* base,
   int ret;
   excom_kevent_t kev;
 
-  excom_kevent_set(&kev, -1, 0, EV_DELETE, 0, 0, NULL);
+  excom_kevent_set(&kev, event->fd, 0, EV_DELETE, 0, 0, NULL);
 
   ret = excom_kevent(base->kqueuefd, &kev, 1, NULL, 0, NULL);
 
@@ -81,8 +83,8 @@ void excom_event_loop(struct excom_event_base* base, void* ptr)
 #define curev (events[i])
   while(base->loop)
   {
-    n = excom_kqueue(base->kqueuefd, NULL, 0, events,
-      base->maxevents, timeout);
+    n = excom_kevent(base->kqueuefd, NULL, 0, events,
+      base->maxevents, &timeout);
 
     if(n < 0)
     {
@@ -129,7 +131,7 @@ void excom_event_loop(struct excom_event_base* base, void* ptr)
 
 void excom_event_loop_end(struct excom_event_base* base)
 {
-
+  base->loop = false;
 }
 
 #endif

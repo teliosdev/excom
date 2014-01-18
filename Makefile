@@ -1,5 +1,7 @@
 CFLAGS  += -std=c99 -g3 -Wall -Wextra -fPIC -iquote$(CURDIR)/inc -DEXCOM_EPOLL
 LDFLAGS += -L$(CURDIR) -pthread
+RM ?= rm -f
+CURDIR ?= `pwd`
 
 OBJS := src/excom/server.o src/excom/string.o src/excom/thread.o \
   src/excom/factory.o src/excom/event.o src/excom/server/client.o \
@@ -11,8 +13,8 @@ CFLAGS += -DEXCOM_INCLUDE_SERVER_CLIENT
 
 default: excom.out
 
-libexcom.a: $(OBJS) Makefile
-	$(AR) r $@ $(patsubst Makefile,,$^)
+libexcom.a: $(OBJS)
+	$(AR) r $@ $?
 
 excom.out: libexcom.a $(BINOJBS)
 	$(CC) -o $@ $(CFLAGS) $(LDFLAGS) $(BINOJBS) -lexcom
@@ -25,5 +27,6 @@ inc/excom.h: inc/excom/protocol/packets.def
 inc/excom/protocol/packets.def: scripts/packets.rb scripts/packet_generator.rb
 	ruby scripts/packet_generator.rb scripts/packets.rb inc/excom/protocol/packets.def
 
-%.o: %.c inc/*.h inc/*/*.h inc/*/*/*.h inc/excom/protocol/packets.def Makefile
+.SUFFIXES: .o .c
+.c.o: inc/*.h inc/*/*.h inc/*/*/*.h inc/excom/protocol/packets.def Makefile
 	$(CC) -o $@ $(CFLAGS) $(LDFLAGS) -c $<

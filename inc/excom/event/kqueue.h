@@ -7,7 +7,7 @@
 
 #if defined(EXCOM64) && defined(EXCOM_MAC)
 #  define excom_kevent_t struct kevent64_s
-#  define excom_kevent kevent64
+#  define excom_kevent(a,b,c,d,e,f) kevent64(a,b,c,d,e,0,f)
 #  define excom_kevent_set(a,b,c,d,e,f,i) EV_SET64(a,b,c,d,e,f,i,0,0)
 #else
 #  define excom_kevent_t struct kevent

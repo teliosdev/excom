@@ -7,7 +7,7 @@ int excom_event_base_init(excom_event_base_t* base,
   base->loop      = true;
   base->epollfd   = epoll_create1(0);
   base->timeout   = 500;
-  base->maxevents = 10;
+  base->maxevents = 32;
   base->runner    = runner;
 
   if(base->epollfd < 0)
