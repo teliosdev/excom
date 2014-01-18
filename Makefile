@@ -1,18 +1,13 @@
-CFILES  :=
 OBJS    :=
-BINFILES:=
 BINOBJS :=
 CFLAGS  += -std=c99 -g3 -Wall -Wextra -fPIC -iquote$(CURDIR)/inc -DEXCOM_EPOLL
 LDFLAGS += -L$(CURDIR) -pthread
 
-CFILES += src/excom/server.c src/excom/string.c src/excom/thread.c \
-  src/excom/factory.c src/excom/event.c src/excom/server/client.c \
-  src/excom/client.c src/excom/event/epoll.c src/excom/event/kqueue.c
-BINFILES += src/excom-cli/main.c
+OJBS += src/excom/server.o src/excom/string.o src/excom/thread.o \
+  src/excom/factory.o src/excom/event.o src/excom/server/client.o \
+  src/excom/client.o src/excom/event/epoll.o src/excom/event/kqueue.o
+BINOJBS += src/excom-cli/main.o
 CFLAGS += -DEXCOM_INCLUDE_SERVER_CLIENT
-
-OBJS += $(patsubst %.c,%.o, $(CFILES))
-BINOJBS += $(patsubst %.c,%.o, $(BINFILES))
 
 .PHONY: default clean
 
