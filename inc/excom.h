@@ -38,6 +38,12 @@
 #include "excom/event.h"
 #include "excom/server.h"
 
+#if UINTPTR_MAX == 0xffffffffffffffff
+#  define EXCOM64
+#else
+#  define EXCOM32
+#endif
+
 #define excom_malloc malloc
 #define excom_calloc calloc
 #define excom_free free

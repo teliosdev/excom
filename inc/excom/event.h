@@ -11,6 +11,7 @@ typedef struct excom_event {
   int fd;
   uint32_t flags;
   void* data;
+  void* _bdata;
   struct excom_event* root;
 } excom_event_t;
 

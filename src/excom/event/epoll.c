@@ -56,11 +56,10 @@ int excom_event_remove(excom_event_base_t* base,
 
 void excom_event_loop(excom_event_base_t* base, void* ptr)
 {
-  struct epoll_event* events;
+  //struct epoll_event* events;
   excom_event_t event, *eptr;
   int n, i;
-
-  events = excom_malloc(base->maxevents * sizeof(struct epoll_event));
+  struct epoll_event events[base->maxevents];
   event.base = base;
 
   while(base->loop)
@@ -78,8 +77,6 @@ void excom_event_loop(excom_event_base_t* base, void* ptr)
       (*base->runner)(event, ptr);
     }
   }
-
-  excom_free(events);
 }
 
 void excom_event_loop_end(excom_event_base_t* base)
