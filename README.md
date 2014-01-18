@@ -40,12 +40,12 @@ use them:
     <tr>
       <td><code>EXCOM_EPOLL</code></td>
       <td><i>none</i></td>
-      <td>If this is defined, excom will try to use epoll.  epoll <b>must</b> have support for <kbd>epoll_create1()</kbd>.</td>
+      <td>If this is defined, excom will try to use epoll.  epoll <b>must</b> have support for <code>epoll_create1()</code>.</td>
     </tr>
     <tr>
       <td><code>EXCOM_KQUEUE</code></td>
       <td><i>none</i></td>
-      <td>If this is defined, excom will try to use kqueue.  If it does not exist on the system, the compiler will error with <code>fatal error: sys/event.h: No such file or directory</code>. <i>Note: the support for kqueue in excom is still a little shakey, since I cannot test it in my current environment.</i></td>
+      <td>If this is defined, excom will try to use kqueue.  If it does not exist on the system, the compiler will error with <q>fatal error: sys/event.h: No such file or directory.</q> <i>Note: the support for kqueue in excom is still a little shakey, since I cannot test it in my current environment.</i></td>
     </tr>
   </tbody>
 </table>
