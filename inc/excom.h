@@ -35,6 +35,8 @@
 #include <stdio.h>
 #include <errno.h>
 
+#include "excom/config.h"
+
 #include "excom/string.h"
 #include "excom/protocol.h"
 #include "excom/thread.h"

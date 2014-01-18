@@ -1,0 +1,113 @@
+#!/usr/bin/env perl
+
+use strict;
+use warnings;
+use File::Temp qw(tempfile);
+use Getopt::Long;
+
+my $verbose = "";
+my $CFLAGS;
+my $LDFLAGS;
+my $CC;
+my %defines = ();
+my $define_prefix = "EXCOM_";
+my $header_file = "inc/excom/config.h";
+
+if(!defined $ENV{CC}) {
+  $CC = "cc";
+} else {
+  $CC = $ENV{CC};
+}
+
+if(!defined $ENV{CFLAGS}) {
+  $CFLAGS = "";
+} else {
+  $CFLAGS = "$ENV{CFLAGS} ";
+}
+
+if(!defined $ENV{LDFLAGS}) {
+  $LDFLAGS = "";
+} else {
+  $LDFLAGS = "$ENV{LDFLAGS} ";
+}
+
+
+GetOptions(
+  "verbose" => \$verbose,
+  "define-prefix=s" => \$define_prefix,
+  "header-file=s" => \$header_file
+  )
+or die();
+
+
+sub compile {
+  my $body = shift;
+  my $flags = shift;
+
+  my ($fh, $filename) = tempfile(SUFFIX => '.c');
+  my $out = $filename;
+  $out =~ s/\.c$/.out/;
+  print $fh $body;
+  close $fh;
+  my $command = "$CC $CFLAGS $LDFLAGS $flags -o $out $filename 2>&1";
+  print "$command\n" if $verbose;
+  my $output = `$command`;
+  print "$output\n" if $verbose;
+  return $? << 8 == 0;
+}
+
+sub define_header {
+  my $header_name = shift;
+
+  my $define = uc $header_name;
+  $define =~ s/(\/|\.)/_/g;
+  $define = "${define_prefix}HAVE_$define";
+
+  $defines{$define} = "";
+}
+
+sub check_header {
+  my $header = shift;
+  my $flags = shift || "";
+  print "Checking for $header...";
+  my $src = <<C
+  #include <stdlib.h>
+  #include <$header>
+  int main(){ return 0; }
+C
+  ;
+
+  if(compile($src, $flags)) {
+    print "yes\n";
+    define_header $header;
+    return 1;
+  } else {
+    print "no\n";
+    return "";
+  }
+}
+
+sub write_header {
+  my $fh;
+  open($fh, ">", $header_file) or die("Cannot open $header_file: $!");
+  my $define_data = "";
+
+  foreach my $key (keys %defines) {
+    $define_data .= "#define $key $defines{$key}\n";
+  }
+
+  print $fh <<CONFIG
+#ifndef _${define_prefix}CONFIG_H
+#define ${define_prefix}CONFIG_H
+
+$define_data
+#endif
+CONFIG
+;
+  close($fh) or die("Could not close file: $!");
+}
+
+check_header "sys/epoll.h";
+check_header "sys/event.h";
+
+write_header;

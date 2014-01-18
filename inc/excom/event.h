@@ -48,10 +48,10 @@ typedef void (excom_event_runner_t)(struct excom_event, void* ptr);
 #undef EXCOM_USE_POLL
 #undef EXCOM_USE_SELECT
 
-#if defined(EXCOM_EPOLL)
+#if defined(EXCOM_EPOLL) || defined(EXCOM_HAVE_SYS_EPOLL_H)
 #  define EXCOM_USE_EPOLL
 #  include "excom/event/epoll.h"
-#elif defined(EXCOM_KQUEUE)
+#elif defined(EXCOM_KQUEUE) || defined(EXCOM_HAVE_SYS_EVENT_H)
 #  define EXCOM_USE_KQUEUE
 #  include "excom/event/kqueue.h"
 #elif defined(EXCOM_DEV_POLL)
