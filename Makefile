@@ -1,12 +1,10 @@
-OBJS    :=
-BINOBJS :=
 CFLAGS  += -std=c99 -g3 -Wall -Wextra -fPIC -iquote$(CURDIR)/inc -DEXCOM_EPOLL
 LDFLAGS += -L$(CURDIR) -pthread
 
-OJBS += src/excom/server.o src/excom/string.o src/excom/thread.o \
+OBJS := src/excom/server.o src/excom/string.o src/excom/thread.o \
   src/excom/factory.o src/excom/event.o src/excom/server/client.o \
   src/excom/client.o src/excom/event/epoll.o src/excom/event/kqueue.o
-BINOJBS += src/excom-cli/main.o
+BINOJBS := src/excom-cli/main.o
 CFLAGS += -DEXCOM_INCLUDE_SERVER_CLIENT
 
 .PHONY: default clean
