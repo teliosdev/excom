@@ -5,7 +5,12 @@ BINOBJS :=
 CFLAGS  += -std=c99 -g3 -Wall -Wextra -fPIC -iquote$(CURDIR)/inc -DEXCOM_EPOLL
 LDFLAGS += -L$(CURDIR) -pthread
 
-include src/local.mk
+CFILES += src/excom/server.c src/excom/string.c src/excom/thread.c \
+  src/excom/factory.c src/excom/event.c src/excom/server/client.c \
+  src/excom/client.c src/excom/event/epoll.c src/excom/event/kqueue.c
+BINFILES += src/excom-cli/main.c
+CFLAGS += -DEXCOM_INCLUDE_SERVER_CLIENT
+
 OBJS += $(patsubst %.c,%.o, $(CFILES))
 BINOJBS += $(patsubst %.c,%.o, $(BINFILES))
 
@@ -29,5 +34,3 @@ inc/excom/protocol/packets.def: scripts/packets.rb scripts/packet_generator.rb
 
 %.o: %.c inc/*.h inc/*/*.h inc/*/*/*.h inc/excom/protocol/packets.def Makefile
 	$(CC) -o $@ $(CFLAGS) $(LDFLAGS) -c $<
-
-Makefile: src/local.mk src/*/local.mk src/**/local.mk
