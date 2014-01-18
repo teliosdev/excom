@@ -69,9 +69,11 @@ sub define_header {
 sub check_header {
   my $header = shift;
   my $flags = shift || "";
+  my $body = shift || "";
   print "Checking for $header...";
   my $src = <<C
   #include <stdlib.h>
+  $body
   #include <$header>
   int main(){ return 0; }
 C
@@ -108,6 +110,6 @@ CONFIG
 }
 
 check_header "sys/epoll.h";
-check_header "sys/event.h";
+check_header "sys/event.h", "", "#include <sys/types.h>";
 
 write_header;
