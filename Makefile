@@ -32,6 +32,6 @@ inc/excom/protocol/packets.def: scripts/packets.rb scripts/packet_generator.rb
 	$(CC) -o $@ $(CFLAGS) $(LDFLAGS) -c $<
 
 depend:
-		gcc -E -MM $(CFLAGS) $(OBJS:.o=.c) > .depend
+	gcc -E -MM $(CFLAGS) $(OBJS:.o=.c) > .depend
 
 -include .depend
