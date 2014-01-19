@@ -20,7 +20,7 @@ excom.out: libexcom.a $(BINOJBS)
 	$(CC) -o $@ $(CFLAGS) $(LDFLAGS) $(BINOJBS) -lexcom
 
 clean:
-	$(RM) $(OBJS) libexcom.a excom
+	$(RM) $(OBJS) libexcom.a excom .depend
 
 inc/excom.h: inc/excom/protocol/packets.def
 
@@ -28,5 +28,10 @@ inc/excom/protocol/packets.def: scripts/packets.rb scripts/packet_generator.rb
 	ruby scripts/packet_generator.rb scripts/packets.rb inc/excom/protocol/packets.def
 
 .SUFFIXES: .o .c
-.c.o: inc/*.h inc/*/*.h inc/*/*/*.h inc/excom/protocol/packets.def Makefile
+.c.o:
 	$(CC) -o $@ $(CFLAGS) $(LDFLAGS) -c $<
+
+depend:
+		gcc -E -MM $(CFLAGS) $(OBJS:.o=.c) > .depend
+
+-include .depend

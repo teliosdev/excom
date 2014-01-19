@@ -5,7 +5,11 @@ reject 0x02, :both do
   number :uint8_t, :reason
 end
 
-protocol_version 0x03, :both do
+error 0x03, :both do
+  number :uint8_t, :reason
+end
+
+protocol_version 0x04, :both do
   string :version
   number :uint8_t, :major
   number :uint8_t, :minor

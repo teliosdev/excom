@@ -19,8 +19,16 @@ PACKET(
 );
 
 PACKET(
-  protocol_version,
+  error,
   0x03,
+  {
+    number(uint8_t, reason)
+  }
+);
+
+PACKET(
+  protocol_version,
+  0x04,
   {
     string(version)
     number(uint8_t, major)
