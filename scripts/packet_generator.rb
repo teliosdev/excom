@@ -104,7 +104,7 @@ class Packet
       return super
     end
 
-    @fields << {type: method, arguments: arguments}
+    @fields << {:type => method, :arguments => arguments}
   end
 
   def lock!
