@@ -100,7 +100,7 @@ sub write_header {
 
   print $fh <<CONFIG
 #ifndef _${define_prefix}CONFIG_H
-#define ${define_prefix}CONFIG_H
+#define _${define_prefix}CONFIG_H
 
 $define_data
 #endif
