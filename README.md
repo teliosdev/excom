@@ -5,7 +5,10 @@ An alternative to current chat implementations.
 
 ## Compiling
 
-No configure, only `make`.  Sorry, I'm comfortable with `make`, and I
+Before the project can be compiled, the `configure` script must be
+run.  It generates a header file that is used by the project.
+
+This project uses make.  Sorry, I'm comfortable with `make`, and I
 know how to use it.  However, building excom without make shouldn't
 be that difficult.  Excom requires the c99 standard, excluding
 `stdbool.h` (it will use it if it can).  Some defines and how you can
