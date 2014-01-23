@@ -4,5 +4,4 @@ compiler:
   - clang
   - gcc
 
-before_script: ./configure
-script: make test
+install: make get-deps

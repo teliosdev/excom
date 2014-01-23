@@ -37,3 +37,5 @@ inc/excom/protocol/packets.def: scripts/packets.rb scripts/packet_generator.rb
 %.out: %.c %.test inc/*.h inc/*/*.h inc/*/*/*.h test/utest.h
 	$(CC) -o $@ $(CFLAGS) $(LDFLAGS) -x c $< -lexcom
 
+get-deps:
+	sudo apt-get install valgrind
