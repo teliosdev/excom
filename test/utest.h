@@ -118,7 +118,7 @@
         TEXT_COLOR_MAGENTA "\": ");           \
       do body while(0);                       \
       if(test_success) {                      \
-        output(TEXT_COLOR_GREEN "OK\n");      \
+        output(TEXT_COLOR_BOLD_GREEN "OK\n"); \
       }                                       \
     } while(0);
 
@@ -127,10 +127,11 @@
       if(!(body)) {                                     \
         test_success = 0;                               \
         failed++;                                       \
-        output2(TEXT_COLOR_RED "\n\t\t\tASSERT FAILED " \
-          "\"" TEXT_COLOR_BOLD_RED #body TEXT_COLOR_RED \
-          "\"\n\t\t\tLINE " TEXT_COLOR_BOLD_RED "%d"    \
-          TEXT_COLOR_RED "\n\t\t\tFILE \""              \
+        output2("\n" TEXT_COLOR_RED                     \
+          "\t\t\tASSERT FAILED "                        \
+          "\"" TEXT_COLOR_BOLD_RED #body "\"\n\t\t\t"   \
+          TEXT_COLOR_RED "LINE " TEXT_COLOR_BOLD_RED    \
+          "%d"  "\n\t\t\t" TEXT_COLOR_RED "FILE \""     \
           TEXT_COLOR_BOLD_RED "%s" TEXT_COLOR_RED       \
           "\"\n", __LINE__, FILE);                      \
       }                                                 \
@@ -145,7 +146,8 @@
         TEXT_COLOR_MAGENTA "\": ");              \
       do body while(0);                          \
       if(test_success) {                         \
-        output(TEXT_COLOR_GREEN "\n\t\t\tOK\n"); \
+        output("\n\t\t\t" TEXT_COLOR_GREEN       \
+          "OK\n");                               \
       }                                          \
     } while(0);
 
@@ -157,10 +159,11 @@
       if(!(body)) {                                     \
         test_success = 0;                               \
         failed++;                                       \
-        output2(TEXT_COLOR_RED "\n\t\t\tASSERT FAILED " \
-          "\"" TEXT_COLOR_BOLD_RED #body TEXT_COLOR_RED \
-          "\"\n\t\t\tLINE " TEXT_COLOR_BOLD_RED "%d"    \
-          TEXT_COLOR_RED "\n\t\t\tFILE \""              \
+        output2("\n" TEXT_COLOR_RED                     \
+          "\t\t\tASSERT FAILED "                        \
+          "\"" TEXT_COLOR_BOLD_RED #body "\"\n\t\t\t"   \
+          TEXT_COLOR_RED "LINE " TEXT_COLOR_BOLD_RED    \
+          "%d"  "\n\t\t\t" TEXT_COLOR_RED "FILE \""     \
           TEXT_COLOR_BOLD_RED "%s" TEXT_COLOR_RED       \
           "\"", __LINE__, FILE);                        \
       }                                                 \
@@ -176,12 +179,14 @@
 # define BEFORE(_)
 # define AFTER(body) body;
 
-# define TEST_AFTER_HOOK1 do                                     \
-  {                                                              \
-    output2(TEXT_COLOR_MAGENTA "\n\tRESULT:\n\t\tPASSED TESTS: " \
-      TEXT_COLOR_BOLD_MAGENTA "%zu" TEXT_COLOR_MAGENTA           \
-      "\n\t\tFAILED TESTS: " TEXT_COLOR_BOLD_MAGENTA "%zu"       \
-      TEXT_COLOR_MAGENTA "\n", tests - failed, failed);          \
+# define TEST_AFTER_HOOK1 do                            \
+  {                                                     \
+    output2("\n\t" TEXT_COLOR_MAGENTA "RESULT:\n\t\t"   \
+      TEXT_COLOR_MAGENTA "PASSED TESTS: "               \
+      TEXT_COLOR_BOLD_MAGENTA "%zu" TEXT_COLOR_MAGENTA  \
+      "\n\t\t" TEXT_COLOR_MAGENTA "FAILED TESTS: "      \
+      TEXT_COLOR_BOLD_MAGENTA "%zu"                     \
+      TEXT_COLOR_MAGENTA "\n", tests - failed, failed); \
   } while(0)
 
 # define TEST_AFTER_HOOK2
