@@ -5,4 +5,4 @@ compiler:
   - gcc
 
 before_script: ./configure
-script: make
+script: make test

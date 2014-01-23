@@ -9,6 +9,7 @@ void excom_string_init(excom_string_t* string)
 {
   string->size = 0;
   string->body = NULL;
+  string->freeable = false;
 }
 
 void excom_string_fill(excom_string_t* string, uint32_t size,
@@ -25,16 +26,15 @@ int excom_string_dup(excom_string_t* string,
   int err = 0;
 
   errno = 0;
+  excom_string_init(out);
 
   if(string->size == 0)
   {
-    out->size = 0;
-    out->body = NULL;
-
     return 0;
   }
 
-  buf = excom_malloc(string->size);
+
+  buf = excom_malloc(string->size + 1);
 
   if(buf == NULL)
   {
@@ -47,6 +47,7 @@ int excom_string_dup(excom_string_t* string,
   else
   {
     buf = memcpy(buf, string->body, string->size);
+    buf[string->size] = 0;
 
     out->size = string->size;
     out->body = buf;

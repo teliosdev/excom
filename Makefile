@@ -6,6 +6,7 @@ CURDIR ?= `pwd`
 OBJS := src/excom/server.o src/excom/string.o src/excom/thread.o \
   src/excom/factory.o src/excom/event.o src/excom/server/client.o \
   src/excom/client.o src/excom/event/epoll.o src/excom/event/kqueue.o
+TESTOBJS:= test/string.out
 BINOJBS := src/excom-cli/main.o
 CFLAGS += -DEXCOM_INCLUDE_SERVER_CLIENT
 
@@ -19,19 +20,20 @@ libexcom.a: $(OBJS)
 excom.out: libexcom.a $(BINOJBS)
 	$(CC) -o $@ $(CFLAGS) $(LDFLAGS) $(BINOJBS) -lexcom
 
+test: libexcom.a $(TESTOBJS)
+	@./test/run_tests ./test
+
 clean:
-	$(RM) $(OBJS) libexcom.a excom .depend
+	$(RM) $(OBJS) $(TESTOBJS) libexcom.a excom
 
 inc/excom.h: inc/excom/protocol/packets.def
 
 inc/excom/protocol/packets.def: scripts/packets.rb scripts/packet_generator.rb
 	ruby scripts/packet_generator.rb scripts/packets.rb inc/excom/protocol/packets.def
 
-.SUFFIXES: .o .c
-.c.o:
+%.o: %.c inc/*.h inc/*/*.h inc/*/*/*.h
 	$(CC) -o $@ $(CFLAGS) $(LDFLAGS) -c $<
 
-depend:
-	gcc -E -MM $(CFLAGS) $(OBJS:.o=.c) > .depend
+%.out: %.c %.test inc/*.h inc/*/*.h inc/*/*/*.h test/utest.h
+	$(CC) -o $@ $(CFLAGS) $(LDFLAGS) -x c $< -lexcom
 
--include .depend
