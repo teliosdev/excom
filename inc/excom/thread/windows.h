@@ -5,7 +5,8 @@
 
 /*!
 */
-typedef struct excom_thread {
+typedef struct excom_thread
+{
   HANDLE thread;
   void* ret;
 } excom_thread_t;

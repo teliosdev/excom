@@ -3,7 +3,8 @@
 
 #include <sys/epoll.h>
 
-typedef struct excom_event_base {
+typedef struct excom_event_base
+{
   bool loop;
   int epollfd;
   int timeout;

@@ -6,7 +6,8 @@
  * Nothing here yet.
  */
 
-typedef struct excom_event {
+typedef struct excom_event
+{
   struct excom_event_base* base;
   int fd;
   uint32_t flags;
@@ -15,7 +16,8 @@ typedef struct excom_event {
   struct excom_event* root;
 } excom_event_t;
 
-typedef struct excom_event_buffer {
+typedef struct excom_event_buffer
+{
   size_t max;
   // The number of characters in the buffer.
   size_t data;
@@ -86,6 +88,9 @@ int excom_event_buffer_init2(excom_event_buffer_t* buf,
 
 int excom_event_buffer_append(excom_event_buffer_t* buf,
   size_t appends, ...);
+
+void excom_event_buffer_format(excom_event_buffer_t* buf,
+  const char* format, ...);
 
 int excom_event_buffer_write(excom_event_buffer_t* buf,
   int sock);

@@ -64,11 +64,16 @@
 # undef AFTER
 #endif
 
+#ifdef PREFIX
+# undef PREFIX
+#endif
+
 #ifdef TEST_PREFIX
 # define SET(_)
 # define TEST(_, __)
 # define BEFORE(_)
 # define AFTER(_)
+# define PREFIX(body) body
 # include <stdlib.h>
 # include <stdio.h>
 #endif
@@ -82,6 +87,7 @@
 # define SET(_) sets++;
 # define TEST(_, __) tests++;
 # define BEFORE(body) body;
+# define PREFIX(_)
 
 # define TEST_BEFORE_HOOK2                               \
   output(TEXT_COLOR_MAGENTA "BEGIN TESTING FROM FILE \"" \
@@ -98,6 +104,7 @@
     TEXT_COLOR_MAGENTA "\":\n");
 # define BEFORE(_)
 # define AFTER(_)
+# define PREFIX(_)
 
 # define uassert_empty(value) \
   uassert(((intmax_t) (value)) == 0)
@@ -178,6 +185,7 @@
 # define TEST(_, __)
 # define BEFORE(_)
 # define AFTER(body) body;
+# define PREFIX(_)
 
 # define TEST_AFTER_HOOK1 do                            \
   {                                                     \

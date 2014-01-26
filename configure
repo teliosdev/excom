@@ -42,7 +42,7 @@ or die();
 
 sub compile {
   my $body = shift;
-  my $flags = shift;
+  my $flags = shift || "";
 
   my ($fh, $filename) = tempfile(SUFFIX => '.c');
   my $out = $filename;
@@ -68,7 +68,7 @@ sub define_header {
 
 sub check_header {
   my $header = shift;
-  my $flags = shift || "";
+  my $flags = shift;
   my $body = shift || "";
   print "Checking for $header...";
   my $src = <<C

@@ -1,7 +1,8 @@
 #ifndef _EXCOM_THREAD_POSIX_H
 #define _EXCOM_THREAD_POSIX_H
 
-typedef struct excom_thread {
+typedef struct excom_thread
+{
   pthread_t thread;
   void* ret;
 } excom_thread_t;

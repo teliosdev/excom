@@ -14,7 +14,8 @@
  * cause a worker to terminate; however, it can be used externally to
  * detect the status of the worker.
  */
-typedef enum excom_factory_worker_status {
+typedef enum excom_factory_worker_status
+{
 
   /*!
    * This is set when the worker failed to start.  It is the only time
@@ -50,7 +51,8 @@ typedef void* (excom_factory_job_runner_t)(void*);
  * doubly linked list that can be appended to.  It is also locked
  * when being read from, or when being added to.
  */
-typedef struct excom_factory_job {
+typedef struct excom_factory_job
+{
 
   /*!
    * The function that contains the code to run the job.
@@ -76,7 +78,8 @@ typedef struct excom_factory_job {
 /*!
  * Describes a worker that runs tasks.
  */
-typedef struct excom_factory_worker {
+typedef struct excom_factory_worker
+{
 
   /*!
    * The thread that the worker is running in.  The value of this is
@@ -105,7 +108,8 @@ typedef struct excom_factory_worker {
 /*!
  * The factory that manages the workers and jobs.
  */
-typedef struct excom_factory {
+typedef struct excom_factory
+{
 
   /*!
    * The number of workers there are.
@@ -130,7 +134,8 @@ typedef struct excom_factory {
    * Contains the locking information required for the job linked
    * list, in order to make the read and writes to it atomic.
    */
-  struct {
+  struct
+  {
     /*!
      * A mutex to lock in order to gain access to the job list.
      */

@@ -50,6 +50,11 @@
 #  define EXCOM32
 #endif
 
+#define EXCOM_VERSION "0.0.1"
+#define EXCOM_VERSION_MAJOR 0
+#define EXCOM_VERSION_MINOR 0
+#define EXCOM_VERSION_PATCH 1
+
 #define excom_malloc malloc
 #define excom_calloc calloc
 #define excom_free free

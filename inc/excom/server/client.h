@@ -1,7 +1,8 @@
 #ifndef _EXCOM_SERVER_CLIENT_H
 #define _EXCOM_SERVER_CLIENT_H
 
-typedef struct excom_server_client {
+typedef struct excom_server_client
+{
   excom_event_t event;
   excom_event_buffer_t outbuf;
   struct excom_server* server;

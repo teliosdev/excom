@@ -15,7 +15,8 @@
 #  define excom_kevent_set(a,b,c,d,e,f,i) EV_SET(a,b,c,d,e,f,i)
 #endif
 
-typedef struct excom_event_base {
+typedef struct excom_event_base
+{
   bool loop;
   int kqueuefd;
 

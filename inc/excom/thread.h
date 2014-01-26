@@ -44,7 +44,8 @@ typedef void* (excom_thread_proc_t)(void*);
  * as the original thread function and the argument passed to it, as
  * well as a pointer to the thread struct.
  */
-typedef struct excom_thread_data {
+typedef struct excom_thread_data
+{
 
   /*!
    * A pointer to the argument that is passed to the thread function.
@@ -77,7 +78,8 @@ typedef struct excom_thread_data {
  *
  * @ingroup threading
  */
-typedef struct excom_thread {
+typedef struct excom_thread
+{
 
   /*!
    * A platform-specific identifier for the thread.

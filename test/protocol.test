@@ -1,0 +1,36 @@
+#include "excom.h"
+
+PREFIX(
+  int excom_protocol_write_packet(excom_buffer_t* out,
+    excom_packet_t* packet);
+)
+
+SET("protocol packet packing")
+
+TEST("protocol version", {
+  excom_packet_t packet;
+  excom_buffer_t buffer;
+  excom_protocol_protocol_version_t* version;
+  char str[] = "\0\0\0\0051.0.0\x01\0\0";
+
+  version = &packet.data.protocol_version;
+
+  excom_string_init(&version->version);
+  excom_string_dupfill(&version->version,
+    strlen("1.0.0"), "1.0.0");
+  version->major = 1;
+  version->minor = 0;
+  version->patch = 0;
+
+  packet.type = packet(protocol_version);
+  excom_buffer_init(&buffer, 32);
+
+  excom_protocol_write_packet(&buffer, &packet);
+
+  uassert(buffer.used == 12);
+  uassert_empty(strncmp((char*) buffer.buf, str, 12));
+
+  excom_string_destroy(&version->version);
+  excom_buffer_destroy(&buffer);
+
+})

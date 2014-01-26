@@ -1,5 +1,6 @@
 #include "excom.h"
 #include <stdarg.h>
+#include <ctype.h>
 
 // you're gone, gone, gone away, I watched you disappear
 // all that's left is the ghost of you
@@ -38,12 +39,10 @@ int excom_event_buffer_init2(excom_event_buffer_t* buf,
   return excom_mutex_init(&buf->mutex);
 }
 
-int excom_event_buffer_append(excom_event_buffer_t* buf,
-  size_t appends, ...)
+int excom_event_buffer_append_num(excom_event_buffer_t* buf,
+  size_t appends, excom_string_t** strs)
 {
-  va_list args;
   size_t i, new_size, cur;
-  excom_string_t* strs[appends];
   void* new_buf;
 
   i = excom_mutex_lock(&buf->mutex);
@@ -53,10 +52,8 @@ int excom_event_buffer_append(excom_event_buffer_t* buf,
   }
 
   new_size = buf->data - buf->pos + 1;
-  va_start(args, appends);
   for(i = 0; i < appends; i++)
   {
-    strs[i] = va_arg(args, excom_string_t*);
     new_size += strs[i]->size;
   }
 
@@ -93,6 +90,24 @@ int excom_event_buffer_append(excom_event_buffer_t* buf,
   printf("New buffer is %s\n", buf->start);
 
   return excom_mutex_unlock(&buf->mutex);
+}
+
+int excom_event_buffer_append(excom_event_buffer_t* buf,
+  size_t appends, ...)
+{
+  va_list args;
+  excom_string_t* strs[appends];
+  size_t i;
+
+  va_start(args, appends);
+  for(i = 0; i < appends; i++)
+  {
+    strs[i] = va_arg(args, excom_string_t*);
+  }
+  va_end(args);
+
+  return excom_event_buffer_append_num(buf, appends, strs);
+
 }
 
 int excom_event_buffer_write(excom_event_buffer_t* buf,
@@ -142,4 +157,85 @@ void excom_event_buffer_destroy(excom_event_buffer_t* buf)
   }
 
   excom_free(buf);
+}
+
+void excom_event_buffer_format_va(excom_event_buffer_t* buf,
+  const char* format, va_list va)
+{
+  excom_string_t ary[64];
+  excom_string_t* ptrs[64];
+  char *pos, *tmp, *b = NULL;
+  const char* cur = format;
+  size_t strs = 0;
+  uint32_t s = 0;
+
+  while((pos = strchr(cur, '%')))
+  {
+    if(pos != cur)
+    {
+      excom_string_dupfill(&ary[strs++], pos - cur, pos);
+    }
+
+  top_switch:
+    switch(pos[1])
+    {
+      case '%':
+        excom_string_dupfill(&ary[strs++], 2, "%\0");
+        b = NULL;
+        break;
+      case 's':
+        tmp = va_arg(va, char*);
+        excom_string_dupfill(&ary[strs++], strlen(tmp), tmp);
+        b = NULL;
+        break;
+      case 'S': {
+        excom_string_t* str = va_arg(va, excom_string_t*);
+        excom_string_dup(str, &ary[strs++]);
+        b = NULL;
+        break;
+      }
+      case 'd':
+        s = va_arg(va, uint32_t);
+      case 'b': {
+        uint32_t num;
+        if(b != NULL)
+          num = strtol(b, NULL, 0);
+        else
+          num = s;
+        tmp = va_arg(va, char*);
+        excom_string_dupfill(&ary[strs++], num, tmp);
+        b = NULL;
+        break;
+      }
+
+      default:
+        if(isxdigit(pos[1]) || pos[1] == 'x' || pos[1] == 'X') {
+          if(b == NULL) { b = pos + 1; }
+          pos++;
+          goto top_switch;
+        } else {
+          excom_check_error(EILSEQ, 0, "Unknown parameter in " \
+            "excom_event_buffer_format");
+          break;
+        }
+    }
+
+  }
+
+  for(s = 0; s < strs; s++)
+  {
+    ptrs[s] = &ary[s];
+  }
+
+  excom_event_buffer_append_num(buf, strs, ptrs);
+}
+
+void excom_event_buffer_format(excom_event_buffer_t* buf,
+  const char* format, ...)
+{
+  va_list va;
+
+  va_start(va, format);
+  excom_event_buffer_format_va(buf, format, va);
+  va_end(va);
 }

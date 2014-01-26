@@ -38,7 +38,7 @@ TEST("duplication", {
 
   uassert_equal(string.size, out.size);
   uassert_empty(strncmp(string.body, out.body, out.size));
-  uassert_empty(out.freeable);
+  uassert(out.freeable);
   uassert_empty(out.body[out.size]);
 
   free(out.body);

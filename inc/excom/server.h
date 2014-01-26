@@ -40,7 +40,8 @@
  * socket that the server has open, and it will contain the main
  * event struct from `event.h`.
  */
-typedef struct excom_server {
+typedef struct excom_server
+{
   /*!
    * A fd of the current server.  This is normally `-1` if there is no
    * socket open.
