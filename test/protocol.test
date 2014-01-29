@@ -7,30 +7,49 @@ PREFIX(
 
 SET("protocol packet packing")
 
-TEST("protocol version", {
-  excom_packet_t packet;
-  excom_buffer_t buffer;
-  excom_protocol_protocol_version_t* version;
-  char str[] = "\0\0\0\0051.0.0\x01\0\0";
+#define TEST_PACKET(name, body, fill)           \
+  TEST(#name,                                   \
+  {                                             \
+  excom_packet_t packet;                        \
+  excom_buffer_t buffer;                        \
+  excom_protocol_##name##_t* pack_data;         \
+  pack_data = &packet.data.name;                \
+  body;                                         \
+  packet.type = packet(name);                   \
+  excom_buffer_init(&buffer, 64);               \
+  excom_protocol_write_packet(&buffer, &packet);\
+  uassert(buffer.used == sizeof(fill) - 1);     \
+  uassert_empty(strncmp((char*) buffer.buf,     \
+    fill, sizeof(fill) - 1));                   \
+  excom_buffer_destroy(&buffer);                \
+  })
 
-  version = &packet.data.protocol_version;
+TEST_PACKET(ok, {}, "")
 
-  excom_string_init(&version->version);
-  excom_string_dupfill(&version->version,
+TEST_PACKET(reject,
+{
+  pack_data->reason = 0x40;
+}, "\x40")
+
+TEST_PACKET(error,
+{
+  pack_data->reason = 56;
+}, "\x38")
+
+
+TEST_PACKET(protocol_version,
+{
+  excom_string_init(&pack_data->version);
+  excom_string_fill(&pack_data->version,
     strlen("1.0.0"), "1.0.0");
-  version->major = 1;
-  version->minor = 0;
-  version->patch = 0;
+  pack_data->major = 1;
+  pack_data->minor = 0;
+  pack_data->patch = 0;
+}, "\0\0\0\0051.0.0\x01\0\0")
 
-  packet.type = packet(protocol_version);
-  excom_buffer_init(&buffer, 32);
-
-  excom_protocol_write_packet(&buffer, &packet);
-
-  uassert(buffer.used == 12);
-  uassert_empty(strncmp((char*) buffer.buf, str, 12));
-
-  excom_string_destroy(&version->version);
-  excom_buffer_destroy(&buffer);
-
-})
+TEST_PACKET(command,
+{
+  excom_string_init(&pack_data->command);
+  excom_string_fill(&pack_data->command,
+    strlen("test"), "test");
+}, "\0\0\0\004test")

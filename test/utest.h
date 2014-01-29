@@ -136,11 +136,11 @@
         failed++;                                       \
         output2("\n" TEXT_COLOR_RED                     \
           "\t\t\tASSERT FAILED "                        \
-          "\"" TEXT_COLOR_BOLD_RED #body "\"\n\t\t\t"   \
-          TEXT_COLOR_RED "LINE " TEXT_COLOR_BOLD_RED    \
-          "%d"  "\n\t\t\t" TEXT_COLOR_RED "FILE \""     \
-          TEXT_COLOR_BOLD_RED "%s" TEXT_COLOR_RED       \
-          "\"\n", __LINE__, FILE);                      \
+          "\"" TEXT_COLOR_BOLD_RED #body TEXT_COLOR_RED \
+          "\"\n\t\t\t" TEXT_COLOR_RED "LINE "           \
+          TEXT_COLOR_BOLD_RED "%d"  "\n\t\t\t"          \
+          TEXT_COLOR_RED "FILE \"" TEXT_COLOR_BOLD_RED  \
+          "%s" TEXT_COLOR_RED  "\"\n", __LINE__, FILE); \
       }                                                 \
   } while(0)
 # else
@@ -168,11 +168,11 @@
         failed++;                                       \
         output2("\n" TEXT_COLOR_RED                     \
           "\t\t\tASSERT FAILED "                        \
-          "\"" TEXT_COLOR_BOLD_RED #body "\"\n\t\t\t"   \
-          TEXT_COLOR_RED "LINE " TEXT_COLOR_BOLD_RED    \
-          "%d"  "\n\t\t\t" TEXT_COLOR_RED "FILE \""     \
-          TEXT_COLOR_BOLD_RED "%s" TEXT_COLOR_RED       \
-          "\"", __LINE__, FILE);                        \
+          "\"" TEXT_COLOR_BOLD_RED #body TEXT_COLOR_RED \
+          "\"\n\t\t\t" TEXT_COLOR_RED "LINE "           \
+          TEXT_COLOR_BOLD_RED  "%d"  "\n\t\t\t"         \
+          TEXT_COLOR_RED "FILE \""  TEXT_COLOR_BOLD_RED \
+          "%s" TEXT_COLOR_RED  "\"", __LINE__, FILE);   \
       }                                                 \
     } while(0)
 # endif

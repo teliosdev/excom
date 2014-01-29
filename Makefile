@@ -1,4 +1,4 @@
-CFLAGS  += -std=c99 -g3 -Wall -Wextra -fPIC -iquote$(CURDIR)/inc
+CFLAGS  += -std=c99 -g3 -Wall -Wextra -fPIC -iquote$(CURDIR)/inc $(CFLAG)
 LDFLAGS += -L$(CURDIR) -pthread
 RM ?= rm -f
 CURDIR ?= `pwd`
