@@ -66,7 +66,7 @@ PACKET(
   {
 #{typedata}
   }
-);
+)
 
 PACKDEF
 
