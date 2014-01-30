@@ -24,7 +24,7 @@ typedef union excom_protocol_packet
 #undef PACKET
 
 #define PACKET(name, id, ___) \
-  EXCOM_PROTOCOL_PACKET_##name = id##u,
+  EXCOM_PROTOCOL_PACKET_##name = id##ul,
 
 typedef enum excom_protocol_packets
 {
