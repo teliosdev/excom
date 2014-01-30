@@ -16,6 +16,7 @@ TEST("initialization",
   uassert_equal(buffer.max, 32);
   uassert_equal(buffer.used, 0);
   uassert(buffer.buf);
+  uassert_equal(buffer.buf, buffer.pos);
 });
 
 TEST("C String appending",

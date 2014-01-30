@@ -131,11 +131,26 @@ static void _accept(excom_event_t event, excom_server_t* server)
 
 static void _disconnect(excom_event_t event, excom_server_t* server)
 {
-  if(event.data)
+  excom_server_client_t* client = event.data;
+  if(client)
   {
-    excom_free(event.data);
+    if(server->clients == client)
+    {
+      server->clients = client->_next;
+    }
+    if(client->_prev)
+    {
+      client->_prev->_next = client->_next;
+    }
+    if(client->_next)
+    {
+      client->_next->_prev = client->_prev;
+    }
+
+    excom_free(client);
     event.data = NULL;
   }
+
   close(event.fd);
 }
 

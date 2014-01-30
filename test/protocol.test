@@ -4,16 +4,16 @@ PREFIX(
   int excom_protocol_write_packet(excom_buffer_t* out,
     excom_packet_t* packet);
   void excom_protocol_prefill(excom_packet_t* packet, ...);
-)
+);
 
 BEFORE(
   uint16_t id = 0;
-)
+);
 
-SET("protocol packet packing")
+SET("protocol packet packing");
 
 #define TEST_PACKET(name, body, fill)           \
-  TEST(#name,                                   \
+  TEST(#name " pack",                           \
   {                                             \
   id += 1;                                      \
   excom_packet_t packet;                        \
@@ -32,17 +32,17 @@ SET("protocol packet packing")
   excom_buffer_destroy(&buffer);                \
   })
 
-TEST_PACKET(ok, {}, "\0\0\0\0\0\x01\0\x01")
+TEST_PACKET(ok, {}, "\0\0\0\0\0\x01\0\x01");
 
 TEST_PACKET(reject,
 {
   pack_data->reason = 0x40;
-}, "\0\0\0\x01\0\x02\0\x02\x40")
+}, "\0\0\0\x01\0\x02\0\x02\x40");
 
 TEST_PACKET(error,
 {
   pack_data->reason = 56;
-}, "\0\0\0\x01\0\x03\0\x03\x38")
+}, "\0\0\0\x01\0\x03\0\x03\x38");
 
 
 TEST_PACKET(protocol_version,
@@ -53,16 +53,48 @@ TEST_PACKET(protocol_version,
   pack_data->major = 1;
   pack_data->minor = 0;
   pack_data->patch = 0;
-}, "\0\0\0\x0c\0\x04\0\x04\0\0\0\0051.0.0\x01\0\0")
+}, "\0\0\0\x0c\0\x04\0\x04\0\0\0\0051.0.0\x01\0\0");
 
 TEST_PACKET(command,
 {
   excom_string_init(&pack_data->command);
   excom_string_fill(&pack_data->command,
     strlen("test"), "test");
-}, "\0\0\0\x08\0\x05\0\x05\0\0\0\004test")
+}, "\0\0\0\x08\0\x05\0\x05\0\0\0\004test");
 
-SET("packet management")
+#undef TEST_PACKET
+SET("protocol packet unpacking");
+
+#define TEST_PACKET(name, str, body)              \
+  TEST(#name " unpack", {                         \
+    excom_buffer_t buf;                           \
+    excom_packet_t packet;                        \
+    memset(&packet, 0xdd, sizeof(excom_packet_t));\
+    excom_protocol_##name##_t pack_data;          \
+    excom_buffer_init(&buf, 16);                  \
+    excom_buffer_cappend(&buf, str, sizeof(str)); \
+    uassert_empty(                                \
+      excom_protocol_read_packet(&buf, &packet)   \
+    );                                            \
+    id++;                                         \
+    uassert_equal(packet.type, packet(name));     \
+    uassert_equal(packet.size, sizeof(str) - 9);  \
+    uassert_equal(packet.id, id);                 \
+    pack_data = packet.data.name;                 \
+    (void) pack_data;                             \
+    body;                                         \
+    excom_buffer_destroy(&buf);                   \
+  })
+
+TEST_PACKET(ok, "\0\0\0\0\0\x06\0\x01", {});
+
+TEST_PACKET(reject, "\0\0\0\x01\0\x07\0\x02\x40",
+{
+  uassert_equal(pack_data.reason, 0x40);
+});
+
+#undef TEST_PACKET
+SET("packet management");
 
 TEST("prefill",
 {

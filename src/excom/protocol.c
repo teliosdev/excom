@@ -5,37 +5,61 @@
 #include <arpa/inet.h>
 #endif
 
-static int uint32_t_pack(char* dest, uint32_t n)
+int excom_protocol_read_packet(excom_buffer_t* in,
+  excom_packet_t* packet)
 {
-  uint32_t net = htonl(n);
-  int part;
-  char* ptr = dest;
-  for(part = 0; part < 25; part += 8)
-  {
-    *ptr++ = net >> part;
+  uint32_t size;
+  uint16_t type, id;
+  uint32_t cur = 0;
+
+  cur += excom_protocol_unpack_uint32_t((char*) in->pos, &size);
+  cur += excom_protocol_unpack_uint16_t((char*) in->pos + cur, &id);
+  cur += excom_protocol_unpack_uint16_t((char*) in->pos + cur, &type);
+
+  packet->size = size;
+  packet->id   = id;
+  packet->type = type;
+
+# define PACKET(name, id, body) case packet(name): {      \
+    excom_protocol_##name##_t* pack = &packet->data.name; \
+    (void) pack;                                          \
+    body                                                  \
+    break;                                                \
   }
-  *ptr++ = 0;
-  return 4;
-}
 
-static int uint16_t_pack(char* dest, uint16_t n)
-{
-  uint16_t net = htons(n);
-  int part;
-  char* ptr = dest;
-  for(part = 0; part < 11; part += 8)
+# define string(name) do                                  \
+  {                                                       \
+    uint32_t str_size = 0;                                \
+    cur += excom_protocol_unpack_uint32_t((char*) in->pos \
+      + cur, &str_size);                                  \
+    excom_string_init(&pack->name);                       \
+    excom_string_dupfill(&pack->name, str_size,           \
+      (char*) in->pos + cur);                             \
+  } while(0);
+
+# define number(type, name) do                            \
+  {                                                       \
+    type _buf;                                            \
+    cur += excom_protocol_unpack_##type((char*) in->pos   \
+      + cur,  &_buf);                                     \
+    pack->name = _buf;                                    \
+  } while(0);
+
+  switch(type)
   {
-    *ptr++ = net >> part;
+    case packet(INVALID):
+      printf("INVALID!\n");
+      return 1;
+#   include "excom/protocol/packets.def"
   }
-  *ptr++ = 0;
-  return 2;
-}
 
-static int uint8_t_pack(char* dest, uint8_t n)
-{
-  dest[0] = n;
+# undef PACKET
+# undef string
+# undef number
 
-  return 1;
+  in->pos += cur;
+
+  return 0;
 }
 
 int excom_protocol_write_packet(excom_buffer_t* out,
@@ -55,7 +79,8 @@ int excom_protocol_write_packet(excom_buffer_t* out,
   }
 # define string(name) do                      \
     {                                         \
-      uint32_t_pack(buf, pack.name.size);     \
+      excom_protocol_pack_uint32_t(buf,       \
+        pack.name.size);                      \
       excom_buffer_cappend(&_buf, buf, 4);    \
       excom_buffer_sappend(&_buf, &pack.name);\
       size += 4 + pack.name.size;             \
@@ -63,8 +88,9 @@ int excom_protocol_write_packet(excom_buffer_t* out,
 
 # define number(type, name) do                \
     {                                         \
-      uint32_t s;                             \
-      s = type##_pack(buf, pack.name);        \
+      int s;                                  \
+      s = excom_protocol_pack_##type(buf,     \
+        pack.name);                           \
       excom_buffer_cappend(&_buf, buf, s);    \
       size += s;                              \
     } while(0);
@@ -84,11 +110,11 @@ int excom_protocol_write_packet(excom_buffer_t* out,
 
   packet->size = size;
 
-  uint32_t_pack(buf, size);
+  excom_protocol_pack_uint32_t(buf, size);
   excom_buffer_cappend(out, buf, 4);
-  uint16_t_pack(buf, packet->id);
+  excom_protocol_pack_uint16_t(buf, packet->id);
   excom_buffer_cappend(out, buf, 2);
-  uint16_t_pack(buf, type);
+  excom_protocol_pack_uint16_t(buf, type);
   excom_buffer_cappend(out, buf, 2);
   excom_buffer_bappend(out, &_buf);
 

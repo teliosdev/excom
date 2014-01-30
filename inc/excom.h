@@ -39,9 +39,9 @@
 #include "excom/config.h"
 
 #include "excom/string.h"
-#include "excom/protocol.h"
 #include "excom/thread.h"
 #include "excom/buffer.h"
+#include "excom/protocol.h"
 #include "excom/factory.h"
 #include "excom/event.h"
 #include "excom/server.h"
