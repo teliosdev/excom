@@ -5,7 +5,7 @@ CURDIR ?= `pwd`
 
 OBJS := src/excom/server.o src/excom/string.o src/excom/thread.o \
   src/excom/factory.o src/excom/event.o src/excom/server/client.o \
-  src/excom/client.o src/excom/buffer.c src/excom/event/epoll.o \
+  src/excom/client.o src/excom/buffer.o src/excom/event/epoll.o \
   src/excom/event/kqueue.o src/excom/protocol.o
 TESTOBJS:= test/string.out test/protocol.out
 BINOJBS := src/excom-cli/main.o
