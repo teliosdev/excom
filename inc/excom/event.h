@@ -16,18 +16,7 @@ typedef struct excom_event
   struct excom_event* root;
 } excom_event_t;
 
-typedef struct excom_event_buffer
-{
-  size_t max;
-  // The number of characters in the buffer.
-  size_t data;
-  size_t pos;
 
-  char* start;
-  char* cur;
-  bool freeable;
-  excom_mutex_t mutex;
-} excom_event_buffer_t;
 
 typedef void (excom_event_runner_t)(struct excom_event, void* ptr);
 
@@ -79,23 +68,6 @@ int excom_event_remove(excom_event_base_t* base,
 void excom_event_loop(struct excom_event_base* base, void* ptr);
 
 void excom_event_loop_end(struct excom_event_base* base);
-
-int excom_event_buffer_init(excom_event_buffer_t* buf,
-  size_t max);
-
-int excom_event_buffer_init2(excom_event_buffer_t* buf,
-  excom_string_t* str);
-
-int excom_event_buffer_append(excom_event_buffer_t* buf,
-  size_t appends, ...);
-
-void excom_event_buffer_format(excom_event_buffer_t* buf,
-  const char* format, ...);
-
-int excom_event_buffer_write(excom_event_buffer_t* buf,
-  int sock);
-
-void excom_event_buffer_destroy(excom_event_buffer_t* buf);
 
 #define excom_event_client(event) \
   ((excom_server_client_t*) (event)->data)

@@ -87,6 +87,7 @@
 # define SET(_) sets++;
 # define TEST(_, __) tests++;
 # define BEFORE(body) body;
+# define AFTER(_)
 # define PREFIX(_)
 
 # define TEST_BEFORE_HOOK2                               \
@@ -115,6 +116,9 @@
 # define uassert_nequal(v1, v2) \
   uassert(v1 != v2)
 
+# define uassert_same(str1, str2, len) \
+  uassert_empty(strncmp((char*) str1, (char*) str2, len))
+
 
 # ifndef VERBOSE
 #   define TEST(name, body) do                \
@@ -136,11 +140,12 @@
         failed++;                                       \
         output2("\n" TEXT_COLOR_RED                     \
           "\t\t\tASSERT FAILED "                        \
-          "\"" TEXT_COLOR_BOLD_RED #body TEXT_COLOR_RED \
+          "\"" TEXT_COLOR_BOLD_RED "%s" TEXT_COLOR_RED  \
           "\"\n\t\t\t" TEXT_COLOR_RED "LINE "           \
           TEXT_COLOR_BOLD_RED "%d"  "\n\t\t\t"          \
           TEXT_COLOR_RED "FILE \"" TEXT_COLOR_BOLD_RED  \
-          "%s" TEXT_COLOR_RED  "\"\n", __LINE__, FILE); \
+          "%s" TEXT_COLOR_RED  "\"\n", #body, __LINE__, \
+          FILE);                                        \
       }                                                 \
   } while(0)
 # else
@@ -168,11 +173,12 @@
         failed++;                                       \
         output2("\n" TEXT_COLOR_RED                     \
           "\t\t\tASSERT FAILED "                        \
-          "\"" TEXT_COLOR_BOLD_RED #body TEXT_COLOR_RED \
+          "\"" TEXT_COLOR_BOLD_RED "%s" TEXT_COLOR_RED  \
           "\"\n\t\t\t" TEXT_COLOR_RED "LINE "           \
           TEXT_COLOR_BOLD_RED  "%d"  "\n\t\t\t"         \
           TEXT_COLOR_RED "FILE \""  TEXT_COLOR_BOLD_RED \
-          "%s" TEXT_COLOR_RED  "\"", __LINE__, FILE);   \
+          "%s" TEXT_COLOR_RED  "\"", #body, __LINE__,   \
+          FILE);                                        \
       }                                                 \
     } while(0)
 # endif

@@ -28,7 +28,8 @@ typedef union excom_protocol_packet
 
 typedef enum excom_protocol_packets
 {
-#include "./packets.def"
+  EXCOM_PROTOCOL_PACKET_INVALID = 0ul,
+# include "./packets.def"
 } excom_protocol_packets_t;
 
 #undef PACKET

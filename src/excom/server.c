@@ -92,7 +92,6 @@ static void _accept(excom_event_t event, excom_server_t* server)
 {
   int err;
   excom_server_client_t* client;
-  excom_string_t str;
 
   while(1)
   {
@@ -114,9 +113,7 @@ static void _accept(excom_event_t event, excom_server_t* server)
     client->event.flags = EXCOM_EVENT_READ | EXCOM_EVENT_WRITE |
       EXCOM_EVENT_ERROR | EXCOM_EVENT_CLOSE;
     client->event.data  = client;
-    excom_string_fill(&str, 0, "");
-    excom_string_unfreeable(&str);
-    excom_event_buffer_init2(&client->outbuf, &str);
+    //excom_event_buffer_init(&client->outbuf, 1);
     err = socket_non_blocking(err);
     if(err < 0)
     {

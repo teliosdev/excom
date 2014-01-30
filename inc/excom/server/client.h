@@ -4,7 +4,7 @@
 typedef struct excom_server_client
 {
   excom_event_t event;
-  excom_event_buffer_t outbuf;
+  //excom_event_buffer_t outbuf;
   struct excom_server* server;
   void* data;
 } excom_server_client_t;
