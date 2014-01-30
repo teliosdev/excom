@@ -1,0 +1,109 @@
+#include "excom.h"
+
+SET("buffer management");
+
+PREFIX(
+  int excom_buffer_write(excom_buffer_t*, int);
+)
+
+BEFORE(
+  excom_buffer_t buffer;
+  excom_buffer_init(&buffer, 32);
+);
+
+TEST("initialization",
+{
+  uassert_equal(buffer.max, 32);
+  uassert_equal(buffer.used, 0);
+  uassert(buffer.buf);
+});
+
+TEST("C String appending",
+{
+  memset(buffer.buf, 0xdd, 31);
+  uassert_empty(
+    excom_buffer_cappend(&buffer, "only this gets appended", 4)
+  );
+  uassert_equal(buffer.used, 4);
+  uassert_same(buffer.buf, "only\xdd", 5);
+  buffer.used = 0;
+});
+
+TEST("excom string appending",
+{
+  excom_string_t str;
+  excom_string_init(&str);
+  excom_string_fill(&str, sizeof("hello"), "hello");
+
+  uassert_empty(excom_buffer_sappend(&buffer, &str));
+
+  uassert_equal(buffer.used, sizeof("hello"));
+  uassert_same(buffer.buf, "hello", sizeof("hello") - 1);
+  buffer.used = 0;
+});
+
+TEST("buffer appending",
+{
+  excom_buffer_t buf;
+  uassert_empty(excom_buffer_init(&buf, 16));
+  uassert_empty(
+    excom_buffer_cappend(&buf, "hello world", 11)
+  );
+
+  uassert_empty(excom_buffer_bappend(&buffer, &buf));
+
+  uassert_equal(buffer.used, 11);
+  uassert_same(buffer.buf, "hello world", 11);
+
+  excom_buffer_destroy(&buf);
+  uassert_equal(buf.max, 0);
+  uassert_equal(buf.used, 0);
+  buffer.used = 0;
+});
+
+TEST("formatting",
+{
+  uassert_empty(
+    excom_buffer_format(&buffer, "hello %s", "world")
+  );
+  uassert_equal(buffer.used, 11);
+  uassert_same(buffer.buf, "hello world", 11);
+  buffer.used = 0;
+});
+
+TEST("force resize",
+{
+  char str[] = "FohtnIBgPs5leGO20d24VvP8HvPStP1NWFopdUQuZyJHnosyh6SPUEHb9KFp4hxk9VpWITOb7BhxIkV6";
+
+  uassert_empty(
+    excom_buffer_cappend(&buffer, str, strlen(str) - 1)
+  );
+  uassert_equal(buffer.max, 128);
+  uassert_equal(buffer.used, strlen(str) - 1);
+  uassert_same(buffer.buf, str, strlen(str) - 1);
+  buffer.used = 0;
+});
+
+TEST("writing buffers",
+{
+  int fds[2];
+  ssize_t bytes;
+  char buff[32];
+
+  uassert_empty(excom_buffer_reset(&buffer));
+
+  uassert_empty(pipe(fds));
+  excom_buffer_cappend(&buffer, "hello world", 11);
+
+  excom_buffer_write(&buffer, fds[1]);
+
+  bytes = read(fds[0], buff, 11);
+
+  uassert(bytes == 11);
+  uassert_same(buff, "hello world", 11);
+
+})
+
+AFTER(
+  excom_buffer_destroy(&buffer);
+);

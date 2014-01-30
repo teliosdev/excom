@@ -118,9 +118,14 @@
 
 # define uassert_same(str1, str2, len) \
   uassert_empty(strncmp((char*) str1, (char*) str2, len))
+# define status(body)              \
+    output2("\n\t\t\t"             \
+      TEXT_COLOR_BOLD_YELLOW "%s"  \
+      TEXT_COLOR_RESET, body)
 
 
 # ifndef VERBOSE
+
 #   define TEST(name, body) do                \
     {                                         \
       int test_success = 1;                   \

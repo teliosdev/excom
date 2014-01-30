@@ -3,15 +3,20 @@
 
 typedef struct excom_buffer
 {
+  size_t _init;
   size_t max;
   size_t used;
+  uint8_t* pos;
 
   uint8_t* buf;
   bool unmutable;
+  bool freeable;
   excom_mutex_t mutex;
 } excom_buffer_t;
 
 int excom_buffer_init(excom_buffer_t* buffer, size_t start);
+
+int excom_buffer_reset(excom_buffer_t* buffer);
 
 int excom_buffer_resize(excom_buffer_t* buffer, size_t to_fit);
 
@@ -28,6 +33,9 @@ int excom_buffer_format(excom_buffer_t* out,
   const char* format, ...);
 
 void excom_buffer_destroy(excom_buffer_t* buffer);
+
+#define excom_buffer_remaining(buff) \
+  (buff->used - (buff->pos - buff->buf))
 
 
 #endif
