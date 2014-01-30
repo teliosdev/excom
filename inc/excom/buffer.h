@@ -34,6 +34,8 @@ int excom_buffer_format(excom_buffer_t* out,
 
 void excom_buffer_destroy(excom_buffer_t* buffer);
 
+int excom_buffer_write(excom_buffer_t* buffer, int sock);
+
 #define excom_buffer_remaining(buff) \
   (buff->used - (buff->pos - buff->buf))
 

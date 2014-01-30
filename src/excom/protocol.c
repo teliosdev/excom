@@ -131,3 +131,22 @@ void excom_protocol_prefill(excom_packet_t* packet, ...)
 # undef string
 # undef number
 }
+
+int excom_protocol_write(excom_packet_t* packet, int sock)
+{
+  int err = 0;
+
+  excom_buffer_t buffer;
+  err = excom_buffer_init(&buffer, 32);
+  if(err) { return err; }
+
+  err = excom_protocol_write_packet(&buffer, packet);
+  if(err) { return err; }
+
+  err = excom_buffer_write(&buffer, sock);
+  if(err) { return err; }
+
+  excom_buffer_destroy(&buffer);
+
+  return err;
+}

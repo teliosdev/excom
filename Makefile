@@ -8,8 +8,7 @@ OBJS := src/excom/server.o src/excom/string.o src/excom/thread.o \
   src/excom/client.o src/excom/buffer.o src/excom/event/epoll.o \
   src/excom/event/kqueue.o src/excom/protocol.o
 TESTOBJS:= test/string.out test/protocol.out test/buffer.out
-BINOJBS := src/excom-cli/main.o
-CFLAGS += -DEXCOM_INCLUDE_SERVER_CLIENT
+BINOJBS := src/excom-server/client.c src/excom-cli/main.o
 
 .PHONY: default clean
 

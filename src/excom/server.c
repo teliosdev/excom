@@ -23,6 +23,7 @@ void excom_server_init(excom_server_t* server)
   server->sock = -1;
   server->addr = EXCOM_DEFAULT_ADDR;
   server->port = EXCOM_DEFAULT_PORT;
+  server->clients = NULL;
 }
 
 #define ERROR_CHECK(value) do \
@@ -113,7 +114,6 @@ static void _accept(excom_event_t event, excom_server_t* server)
     client->event.flags = EXCOM_EVENT_READ | EXCOM_EVENT_WRITE |
       EXCOM_EVENT_ERROR | EXCOM_EVENT_CLOSE;
     client->event.data  = client;
-    //excom_event_buffer_init(&client->outbuf, 1);
     err = socket_non_blocking(err);
     if(err < 0)
     {
@@ -123,13 +123,14 @@ static void _accept(excom_event_t event, excom_server_t* server)
     {
       excom_server_client_connect(event, client);
       excom_event_add(&server->base, &client->event);
+      client->_next = server->clients;
+      server->clients = client;
     }
   }
 }
 
 static void _disconnect(excom_event_t event, excom_server_t* server)
 {
-  excom_event_remove(&server->base, event.root);
   if(event.data)
   {
     excom_free(event.data);
@@ -158,6 +159,12 @@ static void on_event(excom_event_t event, void* ptr)
       excom_check_error(errno, 0, "Error on accept socket");
       excom_event_loop_end(&server->base);
       return;
+    }
+    else if(event.flags & EXCOM_EVENT_CLOSE)
+    {
+      // wuh?  It was closed?
+
+      excom_check_error(EBADF, 1, "on_event");
     }
   }
   else // it's a client socket?? :o!!
@@ -206,5 +213,34 @@ int excom_server_run(excom_server_t* server)
   excom_event_loop(&server->base, server);
 
   return 0;
+
+}
+
+void excom_server_destroy(excom_server_t* server)
+{
+  excom_server_client_t *client, *next;
+  excom_event_t shutdown = {
+    .base   = &server->base,
+    .fd     = server->sock,
+    .flags  = EXCOM_EVENT_CLOSE,
+    .data   = NULL,
+    ._bdata = NULL,
+    .root   = NULL
+  };
+
+  client = server->clients;
+
+  while(client != NULL)
+  {
+    shutdown.data = client;
+    next = client->_next;
+    excom_server_client_close(shutdown, client);
+    _disconnect(shutdown, server);
+    client = next;
+  }
+
+  server->clients = NULL;
+  close(server->sock);
+  server->sock = -1;
 
 }

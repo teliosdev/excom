@@ -16,4 +16,7 @@ typedef struct excom_packet
   excom_protocol_packet_t data;
 } excom_packet_t;
 
+void excom_protocol_prefill(excom_packet_t* packet, ...);
+int excom_protocol_write(excom_packet_t* packet, int sock);
+
 #endif

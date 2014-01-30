@@ -61,6 +61,8 @@ typedef struct excom_server
   uint32_t addr;
 
   struct excom_event_base base;
+
+  struct excom_server_client* clients;
 } excom_server_t;
 
 /*!
@@ -96,5 +98,7 @@ int excom_server_bind(excom_server_t* server);
  * @returns An error code, or 0 if there was none.
  */
 int excom_server_run(excom_server_t* server);
+
+void excom_server_destroy(excom_server_t* server);
 
 #endif

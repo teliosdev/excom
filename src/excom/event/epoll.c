@@ -67,6 +67,11 @@ void excom_event_loop(excom_event_base_t* base, void* ptr)
     n = epoll_wait(base->epollfd, events, base->maxevents,
       base->timeout);
 
+    if(n < 0 && errno == EINTR)
+    {
+      base->loop = false;
+    }
+
     for(i = 0; i < n; i++)
     {
       eptr = (excom_event_t*) events[i].data.ptr;
