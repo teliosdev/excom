@@ -56,13 +56,33 @@ int excom_string_dup(excom_string_t* string,
 }
 
 int excom_string_dupfill(excom_string_t* string, uint32_t size,
-  char* body)
+  const char* body)
 {
-  excom_string_t buf;
-  buf.size = size;
-  buf.body = body;
+  char* buf;
 
-  return excom_string_dup(&buf, string);
+  if(size == 0)
+  {
+    string->size = 0;
+    string->body = NULL;
+    string->freeable = false;
+
+    return 0;
+  }
+
+  buf = excom_malloc(size + 1);
+
+  if(buf == NULL)
+  {
+    return 1;
+  }
+
+  string->size = size;
+  memcpy(buf, body, size);
+  buf[size] = 0;
+
+  string->body = buf;
+  string->freeable = true;
+  return 0;
 }
 
 void excom_string_destroy(excom_string_t* string)

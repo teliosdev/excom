@@ -1,5 +1,6 @@
 #include "excom.h"
 #include <signal.h>
+#include <sqlite3.h>
 
 static excom_server_t server;
 
@@ -17,6 +18,9 @@ int main(int argc, char* argv[])
 {
   (void) argc;
   (void) argv;
+  excom_backend_t backend;
+  excom_backend_value_t v;
+  char* err;
 
   excom_thread_load();
   printf("[excom-cli] init\n");
@@ -28,4 +32,7 @@ int main(int argc, char* argv[])
   excom_server_run(&server);
   printf("[excom-cli] destroying server\n");
   excom_server_destroy(&server);
+
+  return 0;
+
 }

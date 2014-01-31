@@ -1,12 +1,14 @@
 # excom [![Build Status](https://travis-ci.org/redjazz96/excom.png?branch=master)](https://travis-ci.org/redjazz96/excom)
 
-
 An alternative to current chat implementations.
 
 ## Compiling
 
 Before the project can be compiled, the `configure` script must be
 run.  It generates a header file that is used by the project.
+
+The project uses [libtoml](https://github.com/ajwans/libtoml), which
+is under the 3 clause BSD license.
 
 This project uses make.  Sorry, I'm comfortable with `make`, and I
 know how to use it.  However, building excom without make shouldn't

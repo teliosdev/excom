@@ -1,1 +1,82 @@
 #include "excom.h"
+
+#include <stdio.h>
+#include <errno.h>
+
+#ifdef EXCOM_POSIX
+#  include <sys/types.h>
+#  include <sys/socket.h>
+#  include <netinet/in.h>
+#  include <netdb.h>
+#endif
+
+#include <fcntl.h>
+
+#define ERROR_CHECK(value) do \
+{                             \
+  if(value < 0)               \
+  {                           \
+    err = errno;              \
+    errno = 0;                \
+    return err;               \
+  }                           \
+} while(0)
+
+static int socket_non_blocking(int fd)
+{
+  int flags, err;
+  unsigned long param;
+#ifdef EXCOM_POSIX
+  (void) param;
+  flags = fcntl(fd, F_GETFL);
+  ERROR_CHECK(flags);
+
+  flags |= O_NONBLOCK;
+
+  err = fcntl(fd, F_SETFL, flags);
+  ERROR_CHECK(err);
+
+#else
+  param = 1;
+  (void) flags;
+
+  ioctlsocket(fd, FIONBIO, &param);
+#endif
+
+  return 0;
+}
+
+void excom_client_init(excom_client_t* client)
+{
+  client->sock = -1;
+  client->port = EXCOM_DEFAULT_PORT;
+  client->addr = "127.0.0.1";
+}
+
+int excom_client_connect(excom_client_t* client)
+{
+  struct hostent *he;
+  int err;
+  struct sockaddr_in name;
+
+  client->sock = socket(PF_INET, SOCK_STREAM, 0);
+  ERROR_CHECK(client->sock);
+
+  he = gethostbyname(client->addr);
+  if(he == NULL)
+  {
+    return 1;
+  }
+
+  name.sin_family = AF_INET;
+  name.sin_port   = htons(client->port);
+  memcpy(&name.sin_addr, he->h_addr_list[0], he->h_length);
+
+  if(connect(client->sock, (struct sockaddr*) &name,
+    sizeof(name)) == -1)
+  {
+    excom_return_errno();
+  }
+
+  return socket_non_blocking(client->sock);
+}

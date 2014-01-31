@@ -77,7 +77,7 @@ int excom_string_dup(excom_string_t* string,
  * @returns An error code, or `0` if there was none.
  */
 int excom_string_dupfill(excom_string_t* string, uint32_t size,
-  char* body);
+  const char* body);
 
 void excom_string_destroy(excom_string_t* string);
 
