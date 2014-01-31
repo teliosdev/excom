@@ -194,6 +194,8 @@ static void* worker(void* cl)
     excom_mutex_lock(&client_data->mutex);
     excom_cond_wait(&client_data->cond, &client_data->mutex);
 
+    printf("cond recv sign\n");
+
     packet = client_data->packets;
 
     if(packet != NULL)
@@ -208,18 +210,28 @@ static void* worker(void* cl)
       break;
     }
 
+    printf("packet %p\n", packet);
+
     if(packet == NULL)
     {
       continue;
     }
 
-#   define PACKET(name, __, ___) \
-      case packet(name): \
-        printf("[excom-server] Recieved %s packet!\n", #name);
+#   define PACKET(name, __, ___)                               \
+      case packet(name):                                       \
+        printf("[excom-server] Recieved %s packet!\n", #name); \
+        break;
+
+    printf("checking packet!\n");
 
     switch(packet->type)
     {
 #     include "excom/protocol/packets.def"
+      case packet(INVALID):
+      default:
+        printf("[excom-server] Recieved invalid packet type %d!\n",
+          packet->type);
+        break;
     }
 
 #   undef PACKET

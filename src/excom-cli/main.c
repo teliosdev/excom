@@ -18,6 +18,7 @@ int main(int argc, char* argv[])
   (void) argc;
   (void) argv;
 
+  excom_thread_load();
   printf("[excom-cli] init\n");
   excom_server_init(&server);
   printf("[excom-cli] binding\n");
