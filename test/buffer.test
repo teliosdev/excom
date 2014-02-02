@@ -4,7 +4,7 @@ SET("buffer management");
 
 PREFIX(
   int excom_buffer_write(excom_buffer_t*, int);
-)
+);
 
 BEFORE(
   excom_buffer_t buffer;
@@ -103,7 +103,7 @@ TEST("writing buffers",
   uassert(bytes == 11);
   uassert_same(buff, "hello world", 11);
 
-})
+});
 
 AFTER(
   excom_buffer_destroy(&buffer);

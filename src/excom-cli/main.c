@@ -1,6 +1,5 @@
 #include "excom.h"
 #include <signal.h>
-#include <sqlite3.h>
 
 static excom_server_t server;
 

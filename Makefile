@@ -1,5 +1,5 @@
 CFLAGS  += -std=c99 -g3 -Wall -Wextra -fPIC -iquote$(CURDIR)/inc $(CFLAG)
-LDFLAGS += -L$(CURDIR) -pthread
+LDFLAGS += -L$(CURDIR) -pthread -lexcom -ltoml
 RM ?= rm -f
 CURDIR ?= `pwd`
 
@@ -10,6 +10,8 @@ OBJS := src/excom/server.o src/excom/string.o src/excom/thread.o  \
   src/excom/protocol/pack.o
 TESTOBJS:= test/string.out test/protocol.out test/buffer.out
 BINOJBS := src/excom-server/client.c src/excom-cli/main.o
+
+CFLAGS  += -I$(CURDIR)/lib/toml
 
 .PHONY: default clean
 
@@ -36,11 +38,14 @@ inc/excom.h: inc/excom/protocol/packets.def
 inc/excom/protocol/packets.def: scripts/packets.rb scripts/packet_generator.rb
 	ruby scripts/packet_generator.rb scripts/packets.rb inc/excom/protocol/packets.def
 
-%.o: %.c inc/*.h inc/*/*.h inc/*/*/*.h
-	$(CC) -o $@ $(CFLAGS) $(LDFLAGS) -c $<
+%.o: %.c inc/*.h inc/*/*.h inc/*/*/*.h Makefile
+	$(CC) -o $@ $(CFLAGS) -c $< $(LDFLAGS)
 
-%.out: %.c %.test inc/*.h inc/*/*.h inc/*/*/*.h test/utest.h
-	$(CC) -o $@ $(CFLAGS) $(LDFLAGS) -x c $< -lexcom
+%.out: %.c %.test inc/*.h inc/*/*.h inc/*/*/*.h test/utest.h Makefile
+	$(CC) -o $@ $(CFLAGS) -x c $< $(LDFLAGS)
+
+test/%.c: test/%.test
+	ruby scripts/test.rb
 
 get-deps:
 	sudo apt-get install valgrind

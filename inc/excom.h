@@ -35,6 +35,7 @@
 #include <stdarg.h>
 #include <stdio.h>
 #include <errno.h>
+#include <toml.h>
 
 #include "excom/config.h"
 
