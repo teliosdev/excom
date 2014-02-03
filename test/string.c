@@ -1,7 +1,7 @@
 
 #include <stdlib.h>
 #include <stdio.h>
-#define FILE "string.test"
+#define __FILE "string.test"
 
 #define TEST_PREFIX
 #include "./utest.h"

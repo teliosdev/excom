@@ -1,7 +1,7 @@
 
 #include <stdlib.h>
 #include <stdio.h>
-#define FILE "protocol.test"
+#define __FILE "protocol.test"
 
 #define TEST_PREFIX
 #include "./utest.h"

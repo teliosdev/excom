@@ -40,12 +40,8 @@ void excom_server_client_connect(excom_event_t event,
     EXCOM_VERSION_MINOR, EXCOM_VERSION_PATCH);
   version.id = 1;
 
-  printf("Writing packet to socket...\n");
-
   excom_protocol_write_packet(&client_data->outbuf, &version);
   excom_buffer_write(&client_data->outbuf, client->event.fd);
-
-  printf("done!\n");
 }
 
 void excom_server_client_read(excom_event_t event,
@@ -63,8 +59,6 @@ void excom_server_client_read(excom_event_t event,
   while(err == 0 && !client_data->disconnected)
   {
     out = read(event.fd, buf, 32);
-
-    printf("recieved %zd bytes from client\n", out);
 
     if(out > 0)
     {
@@ -142,13 +136,11 @@ static void check_packet(excom_server_client_t* client)
   int err;
 
   excom_mutex_lock(&client_data->inbuf.mutex);
-  printf("checking packet...\n");
 
   // We need to at least have 4 bytes to read.  The four bytes should
   // represent the size of what is to come.
   if(excom_buffer_remaining(&client_data->inbuf) < 4)
   {
-    printf("not enough to read size\n");
     excom_mutex_unlock(&client_data->inbuf.mutex);
     return;
   }
@@ -159,17 +151,14 @@ static void check_packet(excom_server_client_t* client)
   // until it does.
   if(excom_buffer_remaining(&client_data->inbuf) < 4 + size)
   {
-    printf("not enough to read entire packet\n");
     excom_mutex_unlock(&client_data->inbuf.mutex);
     return;
   }
 
-  printf("read packet\n");
   packet = excom_malloc(sizeof(excom_packet_t));
   err = excom_protocol_read_packet(&client_data->inbuf, packet);
   excom_mutex_unlock(&client_data->inbuf.mutex);
 
-  printf("checking err\n");
   if(err)
   {
     excom_check_error(err, 0, "read_packet");
@@ -177,7 +166,6 @@ static void check_packet(excom_server_client_t* client)
     return;
   }
 
-  printf("adding packet to list\n");
   packet->_next = client_data->packets;
   client_data->packets = packet;
 
@@ -194,8 +182,6 @@ static void* worker(void* cl)
     excom_mutex_lock(&client_data->mutex);
     excom_cond_wait(&client_data->cond, &client_data->mutex);
 
-    printf("cond recv sign\n");
-
     packet = client_data->packets;
 
     if(packet != NULL)
@@ -209,8 +195,6 @@ static void* worker(void* cl)
     {
       break;
     }
-
-    printf("packet %p\n", packet);
 
     if(packet == NULL)
     {

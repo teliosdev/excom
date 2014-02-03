@@ -10,7 +10,7 @@ data = <<-DATA
 
 #include <stdlib.h>
 #include <stdio.h>
-#define FILE "%{file}.test"
+#define __FILE "%{file}.test"
 
 #define TEST_PREFIX
 #include "./utest.h"

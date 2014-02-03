@@ -92,7 +92,7 @@
 
 # define TEST_BEFORE_HOOK2                               \
   output(TEXT_COLOR_MAGENTA "BEGIN TESTING FROM FILE \"" \
-    TEXT_COLOR_BOLD_MAGENTA FILE TEXT_COLOR_MAGENTA      \
+    TEXT_COLOR_BOLD_MAGENTA __FILE TEXT_COLOR_MAGENTA    \
     "\":\n");
 
 #endif
@@ -150,7 +150,7 @@
           TEXT_COLOR_BOLD_RED "%d"  "\n\t\t\t"          \
           TEXT_COLOR_RED "FILE \"" TEXT_COLOR_BOLD_RED  \
           "%s" TEXT_COLOR_RED  "\"\n", #body, __LINE__, \
-          FILE);                                        \
+          __FILE);                                      \
       }                                                 \
   } while(0)
 # else
@@ -183,7 +183,7 @@
           TEXT_COLOR_BOLD_RED  "%d"  "\n\t\t\t"         \
           TEXT_COLOR_RED "FILE \""  TEXT_COLOR_BOLD_RED \
           "%s" TEXT_COLOR_RED  "\"", #body, __LINE__,   \
-          FILE);                                        \
+          __FILE);                                      \
       }                                                 \
     } while(0)
 # endif
