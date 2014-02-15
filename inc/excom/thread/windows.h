@@ -9,6 +9,7 @@ typedef struct excom_thread
 {
   HANDLE thread;
   void* ret;
+  excom_thread_status_t status;
 } excom_thread_t;
 
 typedef CRITICAL_SECTION excom_mutex_t;

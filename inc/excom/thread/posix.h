@@ -5,6 +5,7 @@ typedef struct excom_thread
 {
   pthread_t thread;
   void* ret;
+  excom_thread_status_t status;
 } excom_thread_t;
 
 typedef pthread_mutex_t excom_mutex_t;
