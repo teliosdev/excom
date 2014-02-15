@@ -77,7 +77,14 @@ typedef enum excom_thread_status
 #  include "excom/thread/windows.h"
 #endif
 
+/*
+ * Please note anything within this section will not and should not
+ * be compiled with the primary code base; _IT WILL NOT COMPILE_.
+ */
+
 #ifdef DOXYGEN
+
+#error Using Doxygen header for code base!
 
 /*!
  * Contains information about the thread.  This can be used to
