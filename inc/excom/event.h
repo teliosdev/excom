@@ -16,9 +16,7 @@ typedef struct excom_event
   struct excom_event* root;
 } excom_event_t;
 
-
-
-typedef void (excom_event_runner_t)(struct excom_event, void* ptr);
+typedef void (excom_event_runner_t)(excom_event_t, void*);
 
 /*
 * This is the order in which we will handle choosing event solutions.
@@ -55,6 +53,9 @@ typedef void (excom_event_runner_t)(struct excom_event, void* ptr);
 #  define EXCOM_USE_SELECT
 #  include "excom/event/select.h"
 #endif
+
+#define EXCOM_EVENT_ALL (EXCOM_EVENT_READ|EXCOM_EVENT_WRITE \
+  |EXCOM_EVENT_ERROR|EXCOM_EVENT_CLOSE)
 
 int excom_event_base_init(struct excom_event_base* base,
   excom_event_runner_t* runner);

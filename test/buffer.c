@@ -8,7 +8,8 @@
 #include "./buffer.test"
 #undef TEST_PREFIX
 
-int main() {
+int main()
+{
 #define TEST_BEFORE
 #include "./utest.h"
 TEST_BEFORE_HOOK1;

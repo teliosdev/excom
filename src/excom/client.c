@@ -48,9 +48,13 @@ static int socket_non_blocking(int fd)
 
 void excom_client_init(excom_client_t* client)
 {
-  client->sock = -1;
-  client->port = EXCOM_DEFAULT_PORT;
-  client->addr = "127.0.0.1";
+  client->sock    = -1;
+  client->port    = EXCOM_DEFAULT_PORT;
+  client->addr    = "127.0.0.1";
+  client->packets = NULL;
+  client->disconnected = false;
+
+  excom_mutex_init(&client->mutex);
 }
 
 int excom_client_connect(excom_client_t* client)
@@ -78,5 +82,22 @@ int excom_client_connect(excom_client_t* client)
     excom_return_errno();
   }
 
-  return socket_non_blocking(client->sock);
+  err = socket_non_blocking(client->sock);
+  if(err)
+  {
+    return err;
+  }
+
+  err = excom_buffer_init(&client->buf.in, 32);
+  err |= excom_buffer_init(&client->buf.out, 32);
+
+  return err;
+}
+
+void excom_client_destroy(excom_client_t* client)
+{
+  close(client->sock);
+
+  excom_thread_join(&client->thread, NULL);
+  excom_buffer_destroy(&client->buf.out);
 }

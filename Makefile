@@ -9,11 +9,12 @@ OBJS := src/excom/server.o src/excom/string.o src/excom/thread.o  \
   src/excom/event/kqueue.o src/excom/protocol.o                   \
   src/excom/protocol/pack.o
 TESTOBJS:= test/string.out test/protocol.out test/buffer.out
-BINOJBS := src/excom-server/client.c src/excom-cli/main.o
+BINOJBS := src/excom-server/client.c src/excom-client/client.c    \
+  src/excom-cli/main.o
 
 CFLAGS  += -I$(CURDIR)/lib/toml
 
-.PHONY: default clean
+.PHONY: default clean test get-deps
 
 default: excom.out
 

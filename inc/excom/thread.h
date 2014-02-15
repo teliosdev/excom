@@ -64,6 +64,13 @@ typedef struct excom_thread_data
   struct excom_thread* thread;
 } excom_thread_data_t;
 
+typedef enum excom_thread_status
+{
+  EXCOM_THREAD_STATUS_INVALID = 0u,
+  EXCOM_THREAD_STATUS_RUNNING,
+  EXCOM_THREAD_STATUS_STOPPED
+} excom_thread_status_t;
+
 #ifdef EXCOM_POSIX
 #  include "excom/thread/posix.h"
 #elif defined(EXCOM_WIN)
@@ -91,6 +98,8 @@ typedef struct excom_thread
    * excom_thread_join().  It should never be accessed directly.
    */
   void* ret;
+
+  excom_thread_status_t status;
 } excom_thread_t;
 
 /*!

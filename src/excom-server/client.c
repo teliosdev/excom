@@ -99,7 +99,7 @@ void excom_server_client_error(excom_event_t event,
 void excom_server_client_close(excom_event_t event,
   excom_server_client_t* client)
 {
-  excom_packet_t* packet, * next;
+  excom_packet_t* packet, *next;
   (void) event;
   (void) client;
 
@@ -166,8 +166,10 @@ static void check_packet(excom_server_client_t* client)
     return;
   }
 
+  excom_mutex_lock(&client_data->mutex);
   packet->_next = client_data->packets;
   client_data->packets = packet;
+  excom_mutex_unlock(&client_data->mutex);
 
   excom_cond_signal(&client_data->cond);
 }

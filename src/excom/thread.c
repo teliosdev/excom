@@ -1,6 +1,6 @@
 #include "excom.h"
 
-excom_tls_key_t local_data;
+static excom_tls_key_t local_data;
 
 #ifdef EXCOM_POSIX
 void* excom_thread_wrapper(void* arg)
@@ -33,8 +33,11 @@ int excom_thread_init(
   excom_thread_proc_t* proc,
   void* arg)
 {
+  int err = 0;
+
   excom_thread_data_t* data;
   thread->ret = NULL;
+  thread->status = EXCOM_THREAD_STATUS_RUNNING;
 
   data = excom_malloc(sizeof(excom_thread_data_t));
 
@@ -43,16 +46,23 @@ int excom_thread_init(
   data->thread = thread;
 
 #ifdef EXCOM_POSIX
-  return pthread_create((pthread_t*) &thread->thread, NULL,
+  err = pthread_create((pthread_t*) &thread->thread, NULL,
     excom_thread_wrapper, data);
 #else
   thread->thread = CreateThread(NULL, 0,
     excom_thread_wrapper, data, 0, NULL);
   if(thread->thread == NULL)
   {
-    return GetLastError();
+    err = GetLastError();
   }
 #endif
+
+  if(err)
+  {
+    thread->status = EXCOM_THREAD_STATUS_STOPPED;
+  }
+
+  return err;
 }
 
 void excom_thread_exit(void* retval)
@@ -62,6 +72,7 @@ void excom_thread_exit(void* retval)
   if(d != NULL)
   {
     d->thread->ret = retval;
+    d->thread->status = EXCOM_THREAD_STATUS_STOPPED;
   }
 
 #ifdef EXCOM_POSIX
