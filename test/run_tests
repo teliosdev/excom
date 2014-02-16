@@ -11,6 +11,11 @@ export LD_LIBRARY_PATH="$(pwd):$LD_LIBRARY_PATH"
 
 for f in $DIR
 do
+  if [[ $f != *.out ]]
+  then
+    continue
+  fi
+
   valgrind -q --leak-check=full --malloc-fill=5d --free-fill=3e --error-exitcode=2 "$f"
   EXIT_CODE="$?"
 
