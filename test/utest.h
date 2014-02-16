@@ -39,10 +39,10 @@
 #  define TEXT_COLOR_RESET ""
 # endif
 
-# define output(format) printf(format TEXT_COLOR_RESET)
-# define output2(format, ...) printf(format TEXT_COLOR_RESET, __VA_ARGS__)
-# define error(format) fprintf(stderr, format TEXT_COLOR_RESET)
-# define error2(format, ...) fprintf(stderr, format TEXT_COLOR_RESET, __VA_ARGS__)
+# define output(format) printf(format TEXT_COLOR_RESET); fflush(stdout)
+# define output2(format, ...) printf(format TEXT_COLOR_RESET, __VA_ARGS__); fflush(stdout)
+# define error(format) fprintf(stderr, format TEXT_COLOR_RESET); fflush(stderr)
+# define error2(format, ...) fprintf(stderr, format TEXT_COLOR_RESET, __VA_ARGS__); fflush(stderr)
 
 # define TEST_RETURN (failed > 0)
 

@@ -1,4 +1,4 @@
-CFLAGS  += -std=c99 -g3 -Wall -Wextra -fPIC -iquote$(CURDIR)/inc $(CFLAG)
+CFLAGS  += -std=c99 -fno-builtin -g3 -Wall -Wextra -fPIC -iquote$(CURDIR)/inc $(CFLAG)
 LDFLAGS += -L$(CURDIR) -pthread -lexcom -ltoml
 RM ?= rm -f
 CURDIR ?= `pwd`
