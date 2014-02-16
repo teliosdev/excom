@@ -14,7 +14,9 @@ BINOJBS := src/excom-server/client.c src/excom-client/client.c    \
 
 CFLAGS  += -I$(CURDIR)/lib/toml
 
-.PHONY: default clean test get-deps
+.PHONY: default clean test get-deps cdt
+
+cdt: clean default test
 
 default: excom.out
 

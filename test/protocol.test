@@ -12,24 +12,24 @@ BEFORE(
 
 SET("protocol packet packing");
 
-#define TEST_PACKET(name, body, fill)           \
-  TEST(#name " pack",                           \
-  {                                             \
-  id += 1;                                      \
-  excom_packet_t packet;                        \
-  excom_buffer_t buffer;                        \
-  excom_protocol_##name##_t* pack_data;         \
-  pack_data = &packet.data.name;                \
-  (void) pack_data;                             \
-  body;                                         \
-  packet.id   = id;                             \
-  packet.type = packet(name);                   \
-  excom_buffer_init(&buffer, 64);               \
-  excom_protocol_write_packet(&buffer, &packet);\
-  uassert(buffer.used == sizeof(fill) - 1);     \
-  uassert_same((char*) buffer.buf,              \
-    fill, sizeof(fill) - 1);                    \
-  excom_buffer_destroy(&buffer);                \
+#define TEST_PACKET(name, body, fill)             \
+  TEST(#name " pack",                             \
+  {                                               \
+    id += 1;                                      \
+    excom_packet_t packet;                        \
+    excom_buffer_t buffer;                        \
+    excom_protocol_##name##_t* pack_data;         \
+    pack_data = &packet.data.name;                \
+    (void) pack_data;                             \
+    body;                                         \
+    packet.id   = id;                             \
+    packet.type = packet(name);                   \
+    uassert_empty(excom_buffer_init(&buffer, 64));\
+    excom_protocol_write_packet(&buffer, &packet);\
+    uassert(buffer.used == sizeof(fill) - 1);     \
+    uassert_same((char*) buffer.buf,              \
+      fill, sizeof(fill) - 1);                    \
+    excom_buffer_destroy(&buffer);                \
   })
 
 TEST_PACKET(ok, {}, "\0\0\0\0\0\x01\0\x01");
