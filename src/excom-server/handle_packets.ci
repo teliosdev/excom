@@ -1,50 +1,74 @@
-#define handle(p) void handle_packet_##p(client_data_t* data, excom_packet_t* packet)
-
-handle(ok)
-{
-  (void) data;
-  (void) packet;
+#define handle(p, b) static void handle_packet_##p(client_data_t* data, \
+  excom_packet_t* raw)                \
+{                                     \
+  excom_protocol_##p##_t packet;      \
+  (void) data;                        \
+  (void) raw;                         \
+  (void) packet;                      \
+  packet = raw->data.p;               \
+  b;                                  \
 }
 
-handle(reject)
-{
-  (void) data;
-  (void) packet;
-}
+#define send(t, ...) do               \
+{                                     \
+  excom_packet_t _temp;               \
+  _temp.type = packet(t);             \
+  _temp.id   = raw->id;               \
+  excom_protocol_prefill(&_temp,      \
+    ##__VA_ARGS__);                   \
+  excom_protocol_write_packet(&_temp, \
+    &data->outbuf);                   \
+} while(0)
 
-handle(error)
-{
-  (void) data;
-  (void) packet;
-}
+#define reject(reason) send(reject, EXCOM_REJECT_##reason)
 
-handle(protocol_version)
+handle(ok,
 {
-  (void) data;
-  (void) packet;
-}
 
-handle(ping)
+})
+
+handle(reject,
 {
-  (void) data;
-  (void) packet;
+
+})
+
+handle(error,
+{
+
+})
+
+handle(protocol_version,
+{
+
+  if(packet.major != EXCOM_VERSION_MAJOR ||
+     abs(packet.minor - EXCOM_VERSION_MINOR) > 3 ||
+     abs(packet.patch - EXCOM_VERSION_PATCH) > 10) {
+
+    reject(INVALID_PROTOCOL_ERROR);
+  } else {
+    send(ok);
+  }
+})
+
+handle(ping,
+{
   excom_packet_t response;
 
   response.type = packet(ping);
-  response.id   = packet->id;
+  response.id   = raw->id;
 
   excom_protocol_prefill(&response);
   excom_protocol_write_packet(&response, &data->outbuf);
-}
+})
 
-handle(command)
+handle(command,
 {
   (void) data;
   (void) packet;
-}
+})
 
-handle(command_response)
+handle(command_response,
 {
   (void) data;
   (void) packet;
-}
+})

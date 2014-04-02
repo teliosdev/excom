@@ -1,0 +1,18 @@
+#define handle(p, b) static void handle_packet_##p(excom_client_t* data, \
+  excom_packet_t* raw)                \
+{                                     \
+  excom_protocol_##p##_t packet;      \
+  (void) data;                        \
+  (void) raw;                         \
+  (void) packet;                      \
+  packet = raw->data.p;               \
+  b;                                  \
+}
+
+handle(ok, {})
+handle(reject, {})
+handle(error, {})
+handle(protocol_version, {})
+handle(ping, {})
+handle(command, {})
+handle(command_response, {})

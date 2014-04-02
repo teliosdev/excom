@@ -25,7 +25,7 @@ void sighandle(int signal)
   }
 }
 
-static void pack(excom_packet_t* packet, void* cl)
+static void pack(excom_packet_t* packet, excom_client_t* cl)
 {
 # define PACKET(name, __, ___) case packet(name):             \
     printf("[excom-cli/client] Received %s packet\n", #name); \

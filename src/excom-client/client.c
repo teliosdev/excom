@@ -2,7 +2,9 @@
 
 static void* event_loop(void*);
 static void event_listener(excom_event_t, void*);
-void excom_buffer_inspect(excom_buffer_t* buffer);
+static void default_handler(excom_packet_t*, excom_client_t*);
+
+#include "./handle_packets.ci"
 
 #define check_error do{if(err){return;}}while(0)
 
@@ -17,7 +19,14 @@ void excom_client_handle_packets(excom_client_t* client,
   event.data = NULL;
   event.flags = EXCOM_EVENT_ALL;
 
-  client->handler = handler;
+  if(handler)
+  {
+    client->handler = handler;
+  }
+  else
+  {
+    client->handler = default_handler;
+  }
 
   err = excom_event_base_init(&client->base, event_listener);
   check_error;
@@ -28,6 +37,29 @@ void excom_client_handle_packets(excom_client_t* client,
   check_error;
   err = excom_mutex_init(&client->mutex);
   check_error;
+}
+
+static void default_handler(excom_packet_t* packet,
+                            excom_client_t* cl)
+{
+  #define PACKET(name, __, ___)                            \
+    case packet(name):                                     \
+    printf("[excom-client] Recieved %s packet!\n", #name); \
+    handle_packet_##name(cl, packet);                      \
+    printf("[excom-client] Done handling %s\n.", #name);   \
+    break;                                                 \
+
+  switch(packet->type)
+  {
+#   include "excom/protocol/packets.def"
+    case packet(INVALID):
+    default:
+      printf("[excom-server] Recieved invalid packet type %d!\n",
+        packet->type);
+    break;
+  }
+
+# undef PACKET
 }
 
 static void* event_loop(void* cl)
@@ -81,7 +113,6 @@ static void check_packet(excom_client_t* client)
 
   client->handler(packet, client);
 }
-#undef client_data
 
 static void clread(excom_event_t event,
   excom_client_t* client)

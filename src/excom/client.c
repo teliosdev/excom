@@ -89,7 +89,17 @@ int excom_client_connect(excom_client_t* client)
   }
 
   err = excom_buffer_init(&client->buf.in, 32);
-  err |= excom_buffer_init(&client->buf.out, 32);
+  if(err) { return err; }
+  err = excom_buffer_init(&client->buf.out, 32);
+  if(err) { return err; }
+
+  excom_packet_t version;
+  version.type = packet(protocol_version);
+  excom_protocol_prefill(&version, EXCOM_VERSION, EXCOM_VERSION_MAJOR,
+    EXCOM_VERSION_MINOR, EXCOM_VERSION_PATCH);
+  version.id = 1;
+
+  excom_protocol_write_packet(&version, &client->buf.out);
 
   return err;
 }

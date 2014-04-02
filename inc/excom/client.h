@@ -1,8 +1,6 @@
 #ifndef _EXCOM_CLIENT_H
 #define _EXCOM_CLIENT_H
 
-typedef void (excom_client_packet_handler_t)(excom_packet_t*,
-  void*);
 
 typedef struct excom_client {
   int sock;
@@ -14,7 +12,7 @@ typedef struct excom_client {
   excom_thread_t thread;
   excom_mutex_t mutex;
   excom_packet_t* packets;
-  excom_client_packet_handler_t* handler;
+  void (*handler)(excom_packet_t*, struct excom_client*);
 
   struct
   {
@@ -23,6 +21,9 @@ typedef struct excom_client {
   } buf;
 
 } excom_client_t;
+
+typedef void (excom_client_packet_handler_t)(excom_packet_t*,
+  struct excom_client*);
 
 void excom_client_init(excom_client_t* client);
 int excom_client_connect(excom_client_t* client);

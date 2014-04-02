@@ -17,6 +17,18 @@ typedef struct excom_packet
   struct excom_packet* _next;
 } excom_packet_t;
 
+typedef enum excom_reject_reason
+{
+  EXCOM_REJECT_STANDARD_ERROR = 0x00u,
+  EXCOM_REJECT_INVALID_PROTOCOL_ERROR
+} excom_reject_reason_t;
+
+typedef enum excom_error_reason
+{
+  EXCOM_ERROR_STANDARD_ERROR = 0x00u,
+  EXCOM_REJECT_IMPROPER_PERMISSIONS_ERROR
+} excom_error_reason_t;
+
 int excom_protocol_read_packet(excom_packet_t* packet,
                                excom_buffer_t* in);
 int excom_protocol_write_packet(excom_packet_t* packet,
