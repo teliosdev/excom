@@ -16,6 +16,9 @@ protocol_version 0x04, :both do
   number :uint8_t, :patch
 end
 
+ping 0x05, :both do
+end
+
 command 0x10, :client do
   string :command
 end

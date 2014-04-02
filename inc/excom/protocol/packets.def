@@ -38,6 +38,14 @@ PACKET(
 )
 
 PACKET(
+  ping,
+  0x05,
+  {
+
+  }
+)
+
+PACKET(
   command,
   0x10,
   {

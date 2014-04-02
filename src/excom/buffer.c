@@ -244,7 +244,21 @@ void excom_buffer_inspect(excom_buffer_t* buffer)
 
   for(i = 0; i < buffer->used; i++)
   {
-    printf("%02x(%c) ", buffer->buf[i], buffer->buf[i]);
+    if((buffer->buf + i) == buffer->pos)
+    {
+      printf("| %02x", buffer->buf[i]);
+    }
+    else
+    {
+      printf("%02x", buffer->buf[i]);
+    }
+
+    if(buffer->buf[i] > 0x20 && buffer->buf[i] < 0x7e)
+    {
+      printf("(%c)", buffer->buf[i]);
+    }
+
+    printf(" ");
   }
 
   excom_mutex_unlock(&buffer->mutex);
@@ -271,7 +285,7 @@ int excom_buffer_write(excom_buffer_t* buffer,
   {
     excom_mutex_lock(&buffer->mutex);
     to_write = excom_buffer_remaining(buffer);
-    written = write(sock, buffer->buf, to_write);
+    written = write(sock, buffer->pos, to_write);
 
     if(written < 0)
     {

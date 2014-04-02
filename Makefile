@@ -16,9 +16,9 @@ CFLAGS  += -I$(CURDIR)/lib/toml
 
 .PHONY: default clean test get-deps cdt
 
-cdt: clean default test
-
 default: excom.out
+
+cdt: clean default test
 
 libexcom.a: $(OBJS)
 	$(AR) r $@ $?

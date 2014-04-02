@@ -2,6 +2,7 @@
 
 static void* event_loop(void*);
 static void event_listener(excom_event_t, void*);
+void excom_buffer_inspect(excom_buffer_t* buffer);
 
 #define check_error do{if(err){return;}}while(0)
 
@@ -65,7 +66,7 @@ static void check_packet(excom_client_t* client)
   }
 
   packet = excom_malloc(sizeof(excom_packet_t));
-  err = excom_protocol_read_packet(&client->buf.in, packet);
+  err = excom_protocol_read_packet(packet, &client->buf.in);
   excom_mutex_unlock(&client->buf.in.mutex);
 
   if(err)
@@ -129,6 +130,7 @@ static void clerror(excom_event_t event,
   // umm...
   // this is awkward.
 
+  printf("error!\n");
   (void) event;
   (void) client;
 }

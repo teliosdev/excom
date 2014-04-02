@@ -17,10 +17,10 @@ typedef struct excom_packet
   struct excom_packet* _next;
 } excom_packet_t;
 
-int excom_protocol_read_packet(excom_buffer_t* in,
-  excom_packet_t* packet);
-int excom_protocol_write_packet(struct excom_buffer* out,
-  excom_packet_t* packet);
+int excom_protocol_read_packet(excom_packet_t* packet,
+                               excom_buffer_t* in);
+int excom_protocol_write_packet(excom_packet_t* packet,
+                                excom_buffer_t* out);
 void excom_protocol_prefill(excom_packet_t* packet, ...);
 int excom_protocol_write(excom_packet_t* packet, int sock);
 

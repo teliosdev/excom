@@ -1,8 +1,8 @@
 #include "excom.h"
 
 PREFIX(
-  int excom_protocol_write_packet(excom_buffer_t* out,
-    excom_packet_t* packet);
+  int excom_protocol_write_packet(excom_packet_t* packet,
+    excom_buffer_t* out);
   void excom_protocol_prefill(excom_packet_t* packet, ...);
 );
 
@@ -25,7 +25,7 @@ SET("protocol packet packing");
     packet.id   = id;                             \
     packet.type = packet(name);                   \
     uassert_empty(excom_buffer_init(&buffer, 64));\
-    excom_protocol_write_packet(&buffer, &packet);\
+    excom_protocol_write_packet(&packet, &buffer);\
     uassert(buffer.used == sizeof(fill) - 1);     \
     uassert_same((char*) buffer.buf,              \
       fill, sizeof(fill) - 1);                    \
@@ -74,7 +74,7 @@ SET("protocol packet unpacking");
     excom_buffer_init(&buf, 16);                  \
     excom_buffer_cappend(&buf, str, sizeof(str)); \
     uassert_empty(                                \
-      excom_protocol_read_packet(&buf, &packet)   \
+      excom_protocol_read_packet(&packet, &buf)   \
     );                                            \
     id++;                                         \
     uassert_equal(packet.type, packet(name));     \

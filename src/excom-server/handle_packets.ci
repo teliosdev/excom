@@ -1,0 +1,50 @@
+#define handle(p) void handle_packet_##p(client_data_t* data, excom_packet_t* packet)
+
+handle(ok)
+{
+  (void) data;
+  (void) packet;
+}
+
+handle(reject)
+{
+  (void) data;
+  (void) packet;
+}
+
+handle(error)
+{
+  (void) data;
+  (void) packet;
+}
+
+handle(protocol_version)
+{
+  (void) data;
+  (void) packet;
+}
+
+handle(ping)
+{
+  (void) data;
+  (void) packet;
+  excom_packet_t response;
+
+  response.type = packet(ping);
+  response.id   = packet->id;
+
+  excom_protocol_prefill(&response);
+  excom_protocol_write_packet(&response, &data->outbuf);
+}
+
+handle(command)
+{
+  (void) data;
+  (void) packet;
+}
+
+handle(command_response)
+{
+  (void) data;
+  (void) packet;
+}

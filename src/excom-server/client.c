@@ -15,6 +15,7 @@ static void check_packet(excom_server_client_t* client);
 static void* worker(void* cl);
 
 #define client_data ((client_data_t*) client->data)
+#include "./handle_packets.ci"
 
 void excom_server_client_connect(excom_event_t event,
   excom_server_client_t* client)
@@ -40,7 +41,7 @@ void excom_server_client_connect(excom_event_t event,
     EXCOM_VERSION_MINOR, EXCOM_VERSION_PATCH);
   version.id = 1;
 
-  excom_protocol_write_packet(&client_data->outbuf, &version);
+  excom_protocol_write_packet(&version, &client_data->outbuf);
   excom_buffer_write(&client_data->outbuf, client->event.fd);
 }
 
@@ -156,7 +157,7 @@ static void check_packet(excom_server_client_t* client)
   }
 
   packet = excom_malloc(sizeof(excom_packet_t));
-  err = excom_protocol_read_packet(&client_data->inbuf, packet);
+  err = excom_protocol_read_packet(packet, &client_data->inbuf);
   excom_mutex_unlock(&client_data->inbuf.mutex);
 
   if(err)
@@ -206,6 +207,8 @@ static void* worker(void* cl)
 #   define PACKET(name, __, ___)                               \
       case packet(name):                                       \
         printf("[excom-server] Recieved %s packet!\n", #name); \
+        handle_packet_##name(client_data, packet);             \
+        printf("[excom-server] Done handling %s.\n", #name);   \
         break;
 
     printf("checking packet!\n");

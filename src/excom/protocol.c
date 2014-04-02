@@ -5,8 +5,8 @@
 #include <arpa/inet.h>
 #endif
 
-int excom_protocol_read_packet(excom_buffer_t* in,
-  excom_packet_t* packet)
+int excom_protocol_read_packet(excom_packet_t* packet,
+                               excom_buffer_t* in)
 {
   uint32_t size;
   uint16_t type, id;
@@ -35,6 +35,7 @@ int excom_protocol_read_packet(excom_buffer_t* in,
     excom_string_init(&pack->name);                       \
     excom_string_dupfill(&pack->name, str_size,           \
       (char*) in->pos + cur);                             \
+    cur += str_size;                                      \
   } while(0);
 
 # define number(type, name) do                            \
@@ -62,8 +63,8 @@ int excom_protocol_read_packet(excom_buffer_t* in,
   return 0;
 }
 
-int excom_protocol_write_packet(excom_buffer_t* out,
-  excom_packet_t* packet)
+int excom_protocol_write_packet(excom_packet_t* packet,
+                                excom_buffer_t* out)
 {
   char buf[4];
   excom_buffer_t _buf;
@@ -166,7 +167,7 @@ int excom_protocol_write(excom_packet_t* packet, int sock)
   err = excom_buffer_init(&buffer, 32);
   if(err) { return err; }
 
-  err = excom_protocol_write_packet(&buffer, packet);
+  err = excom_protocol_write_packet(packet, &buffer);
   if(err) { return err; }
 
   err = excom_buffer_write(&buffer, sock);
