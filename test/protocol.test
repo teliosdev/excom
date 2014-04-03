@@ -29,8 +29,7 @@ SET("protocol packet packing");
     uassert(buffer.used == sizeof(fill) - 1);     \
     uassert_same((char*) buffer.buf,              \
       fill, sizeof(fill) - 1);                    \
-    excom_buffer_destroy(buffer);                 \
-    excom_free(buffer);                           \
+    excom_buffer_destroy(&buffer);                \
   })
 
 TEST_PACKET(ok, {}, "\0\0\0\0\0\x01\0\x01");
