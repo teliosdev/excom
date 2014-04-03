@@ -8,7 +8,7 @@ OBJS := src/excom/server.o src/excom/string.o src/excom/thread.o  \
   src/excom/client.o src/excom/buffer.o src/excom/event/epoll.o   \
   src/excom/event/kqueue.o src/excom/protocol.o                   \
   src/excom/protocol/pack.o
-TESTOBJS:= test/string.out test/protocol.out test/buffer.out
+TESTOBJS:= test/string.out
 BINOJBS := src/excom-server/client.c src/excom-client/client.c    \
   src/excom-cli/main.o
 
@@ -44,11 +44,11 @@ inc/excom/protocol/packets.def: scripts/packets.rb scripts/packet_generator.rb
 %.o: %.c inc/*.h inc/*/*.h inc/*/*/*.h Makefile
 	$(CC) -o $@ $(CFLAGS) -c $< $(LDFLAGS)
 
-%.out: %.c %.test inc/*.h inc/*/*.h inc/*/*/*.h test/utest.h Makefile
+%.out: %.c %.test2 inc/*.h inc/*/*.h inc/*/*/*.h test/utest.h Makefile
 	$(CC) -o $@ $(CFLAGS) -x c $< $(LDFLAGS)
 
-test/%.c: test/%.test
-	ruby scripts/test.rb
+test/%.c: test/%.test2
+	ruby scripts/test_generator.rb
 
 get-deps:
 	sudo apt-get install valgrind

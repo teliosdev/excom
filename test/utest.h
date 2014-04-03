@@ -46,67 +46,6 @@
 
 # define TEST_RETURN (failed > 0)
 
-#endif
-
-#ifdef SET
-# undef SET
-#endif
-
-#ifdef TEST
-# undef TEST
-#endif
-
-#ifdef BEFORE
-# undef BEFORE
-#endif
-
-#ifdef AFTER
-# undef AFTER
-#endif
-
-#ifdef PREFIX
-# undef PREFIX
-#endif
-
-#ifdef TEST_PREFIX
-# define SET(_)
-# define TEST(_, __)
-# define BEFORE(_)
-# define AFTER(_)
-# define PREFIX(body) body
-# include <stdlib.h>
-# include <stdio.h>
-#endif
-
-#ifdef TEST_BEFORE
-
-# define TEST_BEFORE_HOOK1 \
-  size_t sets   = 0;       \
-  size_t tests  = 0;       \
-  size_t failed = 0;
-# define SET(_) sets++;
-# define TEST(_, __) tests++;
-# define BEFORE(body) body;
-# define AFTER(_)
-# define PREFIX(_)
-
-# define TEST_BEFORE_HOOK2                               \
-  output(TEXT_COLOR_MAGENTA "BEGIN TESTING FROM FILE \"" \
-    TEXT_COLOR_BOLD_MAGENTA __FILE TEXT_COLOR_MAGENTA    \
-    "\":\n");
-
-#endif
-
-#ifdef TEST_DURING
-
-# define SET(name)                     \
-  output(TEXT_COLOR_MAGENTA "\tSET \"" \
-    TEXT_COLOR_BOLD_MAGENTA name       \
-    TEXT_COLOR_MAGENTA "\":\n");
-# define BEFORE(_)
-# define AFTER(_)
-# define PREFIX(_)
-
 # define uassert_empty(value) \
   uassert(((intmax_t) (value)) == 0)
 
@@ -125,19 +64,6 @@
 
 
 # ifndef VERBOSE
-
-#   define TEST(name, body) do                \
-    {                                         \
-      int test_success = 1;                   \
-      output(TEXT_COLOR_MAGENTA "\t\tTEST \"" \
-        TEXT_COLOR_BOLD_MAGENTA name          \
-        TEXT_COLOR_MAGENTA "\": ");           \
-      do body while(0);                       \
-      if(test_success) {                      \
-        output(TEXT_COLOR_BOLD_GREEN "OK\n"); \
-      }                                       \
-    } while(0);
-
 #   define uassert(body) do                             \
     {                                                   \
       if(!(body)) {                                     \
@@ -154,20 +80,6 @@
       }                                                 \
   } while(0)
 # else
-
-#   define TEST(name, body) do                   \
-    {                                            \
-      int test_success = 1;                      \
-      output(TEXT_COLOR_MAGENTA "\t\tTEST \""    \
-        TEXT_COLOR_BOLD_MAGENTA name             \
-        TEXT_COLOR_MAGENTA "\": ");              \
-      do body while(0);                          \
-      if(test_success) {                         \
-        output("\n\t\t\t" TEXT_COLOR_GREEN       \
-          "OK\n");                               \
-      }                                          \
-    } while(0);
-
 #   define uassert(body) do                             \
     {                                                   \
       output(TEXT_COLOR_MAGENTA "\n\t\t\tASSERT \""     \
@@ -188,25 +100,4 @@
     } while(0)
 # endif
 
-#endif
-
-#ifdef TEST_AFTER
-
-# define SET(_)
-# define TEST(_, __)
-# define BEFORE(_)
-# define AFTER(body) body;
-# define PREFIX(_)
-
-# define TEST_AFTER_HOOK1 do                            \
-  {                                                     \
-    output2("\n\t" TEXT_COLOR_MAGENTA "RESULT:\n\t\t"   \
-      TEXT_COLOR_MAGENTA "PASSED TESTS: "               \
-      TEXT_COLOR_BOLD_MAGENTA "%zu" TEXT_COLOR_MAGENTA  \
-      "\n\t\t" TEXT_COLOR_MAGENTA "FAILED TESTS: "      \
-      TEXT_COLOR_BOLD_MAGENTA "%zu"                     \
-      TEXT_COLOR_MAGENTA "\n", tests - failed, failed); \
-  } while(0)
-
-# define TEST_AFTER_HOOK2
 #endif
