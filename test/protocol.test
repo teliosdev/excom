@@ -1,11 +1,5 @@
 #include "excom.h"
 
-PREFIX(
-  int excom_protocol_write_packet(excom_packet_t* packet,
-    excom_buffer_t* out);
-  void excom_protocol_prefill(excom_packet_t* packet, ...);
-);
-
 BEFORE(
   uint16_t id = 0;
 );
