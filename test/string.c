@@ -1,0 +1,245 @@
+#include <stdlib.h>
+#include <stdio.h>
+#include "excom.h"
+#define __FILE "string.test2"
+#include "utest.h"
+
+//prefix
+
+
+static size_t sets   = 1;
+static size_t tests  = 0;
+static size_t failed = 0;
+
+
+  
+  
+  
+    
+    
+    void _string_management_initialization()
+    {
+      tests++;
+      int test_success = 1;
+      output(TEXT_COLOR_MAGENTA "\t\tTEST \"" TEXT_COLOR_BOLD_MAGENTA
+        " initialization" TEXT_COLOR_MAGENTA
+        "\": ");
+      //before
+      #line 3 "string.test2" 
+excom_string_t string;
+
+#line 4 "string.test2" 
+excom_string_init(&string);
+
+
+      //body
+      #line 7 "string.test2" 
+uassert_empty(string.size);
+
+#line 8 "string.test2" 
+uassert_empty(string.body);
+
+#line 9 "string.test2" 
+uassert_empty(string.freeable);
+
+
+      //after
+      
+  #line 42
+      if(test_success) {
+  #ifdef VERBOSE
+        output("\n\t\t\t" TEXT_COLOR_GREEN "OK\n");
+  #else
+        output(TEXT_COLOR_BOLD_GREEN "OK\n");
+  #endif
+      }
+    }
+  
+    
+    void _string_management_filling()
+    {
+      tests++;
+      int test_success = 1;
+      output(TEXT_COLOR_MAGENTA "\t\tTEST \"" TEXT_COLOR_BOLD_MAGENTA
+        " filling" TEXT_COLOR_MAGENTA
+        "\": ");
+      //before
+      #line 3 "string.test2" 
+excom_string_t string;
+
+#line 4 "string.test2" 
+excom_string_init(&string);
+
+
+#line 13 "string.test2" 
+char str[] = "hello world";
+
+#line 14 "string.test2" 
+excom_string_fill(&string, strlen(str), str);
+
+      //body
+      #line 15 "string.test2" 
+uassert_equal(string.body, str);
+
+#line 16 "string.test2" 
+uassert_equal(string.size, strlen(str));
+
+#line 17 "string.test2" 
+uassert_empty(string.freeable);
+
+
+      //after
+      
+  #line 42
+      if(test_success) {
+  #ifdef VERBOSE
+        output("\n\t\t\t" TEXT_COLOR_GREEN "OK\n");
+  #else
+        output(TEXT_COLOR_BOLD_GREEN "OK\n");
+  #endif
+      }
+    }
+  
+    
+    void _string_management_free_mark()
+    {
+      tests++;
+      int test_success = 1;
+      output(TEXT_COLOR_MAGENTA "\t\tTEST \"" TEXT_COLOR_BOLD_MAGENTA
+        " free mark" TEXT_COLOR_MAGENTA
+        "\": ");
+      //before
+      #line 3 "string.test2" 
+excom_string_t string;
+
+#line 4 "string.test2" 
+excom_string_init(&string);
+
+
+      //body
+      #line 20 "string.test2" 
+uassert_empty(string.freeable);
+
+#line 21 "string.test2" 
+excom_string_freeable(&string);
+
+#line 22 "string.test2" 
+uassert(string.freeable);
+
+#line 23 "string.test2" 
+uassert(excom_string_isfreeable(&string));
+
+#line 24 "string.test2" 
+excom_string_unfreeable(&string);
+
+#line 25 "string.test2" 
+uassert_empty(string.freeable);
+
+
+      //after
+      
+  #line 42
+      if(test_success) {
+  #ifdef VERBOSE
+        output("\n\t\t\t" TEXT_COLOR_GREEN "OK\n");
+  #else
+        output(TEXT_COLOR_BOLD_GREEN "OK\n");
+  #endif
+      }
+    }
+  
+    
+    void _string_management_duplication()
+    {
+      tests++;
+      int test_success = 1;
+      output(TEXT_COLOR_MAGENTA "\t\tTEST \"" TEXT_COLOR_BOLD_MAGENTA
+        " duplication" TEXT_COLOR_MAGENTA
+        "\": ");
+      //before
+      #line 3 "string.test2" 
+excom_string_t string;
+
+#line 4 "string.test2" 
+excom_string_init(&string);
+
+
+#line 29 "string.test2" 
+char str[] = "hello world";
+
+#line 30 "string.test2" 
+excom_string_fill(&string, strlen(str), str);
+
+      //body
+      #line 31 "string.test2" 
+excom_string_t out;
+
+#line 32 "string.test2" 
+excom_string_dup(&string, &out);
+
+#line 33 "string.test2" 
+uassert_equal(string.size, out.size);
+
+#line 34 "string.test2" 
+uassert_same(string.body, out.body, out.size);
+
+#line 35 "string.test2" 
+uassert(out.freeable);
+
+#line 36 "string.test2" 
+uassert_empty(out.body[out.size]);
+
+#line 37 "string.test2" 
+free(out.body);
+
+      //after
+      
+  #line 42
+      if(test_success) {
+  #ifdef VERBOSE
+        output("\n\t\t\t" TEXT_COLOR_GREEN "OK\n");
+  #else
+        output(TEXT_COLOR_BOLD_GREEN "OK\n");
+  #endif
+      }
+    }
+  
+  void _string_management() 
+  {
+    output(TEXT_COLOR_MAGENTA "\tSET \"" TEXT_COLOR_BOLD_MAGENTA
+      " string management" TEXT_COLOR_MAGENTA
+      "\":\n");
+    
+    
+    
+    _string_management_initialization();
+    
+    
+    _string_management_filling();
+    
+    
+    _string_management_free_mark();
+    
+    
+    _string_management_duplication();
+    
+  }
+
+
+int main()
+{
+  
+  
+  
+  _string_management();
+  
+  
+  output2("\n\t" TEXT_COLOR_MAGENTA "RESULT:\n\t\t"
+    "PASSED TESTS: " TEXT_COLOR_BOLD_MAGENTA "%zu"
+    TEXT_COLOR_MAGENTA "\n\t\tFAILED TESTS: "
+    TEXT_COLOR_BOLD_MAGENTA "%zu" TEXT_COLOR_MAGENTA
+    "\n", tests - failed, failed);
+  
+  return TEST_RETURN;
+}
+
