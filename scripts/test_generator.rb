@@ -19,7 +19,6 @@ template = <<-'TEMP'
 //prefix
 <%= prefix %>
 
-static size_t sets   = <%= groups.length %>;
 static size_t tests  = 0;
 static size_t failed = 0;
 
