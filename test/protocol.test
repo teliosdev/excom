@@ -17,20 +17,22 @@ SET("protocol packet packing");
   {                                               \
     id += 1;                                      \
     excom_packet_t packet;                        \
-    excom_buffer_t buffer;                        \
+    excom_buffer_t* buffer;                       \
     excom_protocol_##name##_t* pack_data;         \
     pack_data = &packet.data.name;                \
     (void) pack_data;                             \
     body;                                         \
     packet.id   = id;                             \
     packet.type = packet(name);                   \
+    buffer = excom_malloc(sizeof(excom_buffer_t));\
     uassert_empty(excom_buffer_init(&buffer, 64));\
     excom_buffer_inspect(&buffer);                \
-    excom_protocol_write_packet(&packet, &buffer);\
-    uassert(buffer.used == sizeof(fill) - 1);     \
-    uassert_same((char*) buffer.buf,              \
+    excom_protocol_write_packet(&packet, buffer); \
+    uassert(buffer->used == sizeof(fill) - 1);    \
+    uassert_same((char*) buffer->buf,             \
       fill, sizeof(fill) - 1);                    \
-    excom_buffer_destroy(&buffer);                \
+    excom_buffer_destroy(buffer);                 \
+    excom_free(buffer);                           \
   })
 
 TEST_PACKET(ok, {}, "\0\0\0\0\0\x01\0\x01");
