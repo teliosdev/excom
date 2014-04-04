@@ -63,10 +63,11 @@ int excom_protocol_read_packet(excom_packet_t* packet,
   return 0;
 }
 
-int excom_protocol_write_packet(excom_packet_t* packet, excom_buffer_t* out)
+int excom_protocol_write_packet(excom_packet_t* packet, excom_buffer_t* o)
 {
   char buf[4];
   excom_buffer_t _buf;
+  excom_buffer_t* out = o;
   excom_buffer_init(&_buf, 32);
   uint32_t size = 0;
   uint16_t type = (uint16_t) packet->type;
@@ -109,8 +110,6 @@ int excom_protocol_write_packet(excom_packet_t* packet, excom_buffer_t* out)
 # undef number
 
   packet->size = size;
-
-  printf("%p\n", out);
 
   excom_protocol_pack_uint32_t(buf, size);
   excom_buffer_cappend(out, buf, 4);

@@ -16,7 +16,7 @@ do
     continue
   fi
 
-  valgrind -q --leak-check=full --malloc-fill=5d --free-fill=3e --error-exitcode=2 --read-var-info=yes --track-origins=yes "$f"
+  valgrind -q --leak-check=full --malloc-fill=5d --free-fill=3e --error-exitcode=2 --track-origins=yes "$f"
   EXIT_CODE="$?"
 
   if [ "$EXIT_CODE" != "0" ]
