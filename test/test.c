@@ -1,13 +1,12 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include "excom.h"
-#define __FILE "test.test2"
+#define __FILE "test.test"
 #include "utest.h"
 
 //prefix
 
 
-static size_t sets   = 1;
 static size_t tests  = 0;
 static size_t failed = 0;
 
@@ -24,11 +23,11 @@ static size_t failed = 0;
         " something" TEXT_COLOR_MAGENTA
         "\": ");
       //before
-      #line 4 "test.test2" 
+      #line 4 "test.test" 
 testing
 
       //body
-      #line 5 "test.test2" 
+      #line 5 "test.test" 
 watermelons();
 
       //after
@@ -43,7 +42,7 @@ watermelons();
       }
     }
   
-  void _v1() 
+  void _v1()
   {
     output(TEXT_COLOR_MAGENTA "\tSET \"" TEXT_COLOR_BOLD_MAGENTA
       " v1" TEXT_COLOR_MAGENTA
@@ -57,18 +56,20 @@ watermelons();
 
 int main()
 {
-  
+  output(TEXT_COLOR_MAGENTA "FILE \""  TEXT_COLOR_BOLD_MAGENTA
+         __FILE TEXT_COLOR_MAGENTA "\":\n");
+
   
   
   _v1();
   
-  
+
   output2("\n\t" TEXT_COLOR_MAGENTA "RESULT:\n\t\t"
-    "PASSED TESTS: " TEXT_COLOR_BOLD_MAGENTA "%zu"
-    TEXT_COLOR_MAGENTA "\n\t\tFAILED TESTS: "
+    "PASSED: " TEXT_COLOR_BOLD_MAGENTA "%zu"
+    TEXT_COLOR_MAGENTA "\n\t\tFAILED: "
     TEXT_COLOR_BOLD_MAGENTA "%zu" TEXT_COLOR_MAGENTA
     "\n", tests - failed, failed);
-  
+
   return TEST_RETURN;
 }
 

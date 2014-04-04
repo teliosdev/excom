@@ -77,10 +77,10 @@ int excom_buffer_resize(excom_buffer_t* buffer, size_t to_fit)
   return 0;
 }
 
-int excom_buffer_cappend(excom_buffer_t* buffer, const char* str,
-  size_t size)
+int excom_buffer_cappend(excom_buffer_t* buffer, const char* str, size_t size)
 {
   int chk = 0, err = 0;
+  printf("%p\n", buffer);
 
   if(buffer->unmutable)
   {

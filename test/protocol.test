@@ -1,0 +1,88 @@
+MACRO write-test-packet name, fill, &body
+  id += 1;
+  excom_buffer_t buffer;
+  excom_packet_t packet;
+  excom_protocol_%{name}_t* pack_data;
+  pack_data = &packet.data.%{name};
+  (void) pack_data;
+  {
+    %{body}
+  };
+  packet.id   = id;
+  packet.type = packet(%{name});
+  uassert_empty(excom_buffer_init(&buffer, 64));
+  excom_protocol_write_packet(&packet, &buffer);
+  uassert(buffer.used == sizeof(%{fill}) - 1);
+  uassert_same((char*) buffer.buf,
+    %{fill}, sizeof(%{fill}) - 1);
+  excom_buffer_destroy(&buffer);
+
+MACRO read-test-packet name, str, &body
+  excom_buffer_t buf;
+  excom_packet_t packet;
+  memset(&packet, 0xdd, sizeof(excom_packet_t));
+  excom_protocol_%{name}_t pack_data;
+  excom_buffer_init(&buf, 16);
+  excom_buffer_cappend(&buf, %{str}, sizeof(%{str}));
+  uassert_empty(
+    excom_protocol_read_packet(&packet, &buf)
+  );
+  id++;
+  uassert_equal(packet.type, packet(%{name}));
+  uassert_equal(packet.size, sizeof(%{str}) - 9);
+  uassert_equal(packet.id, id);
+  pack_data = packet.data.%{name};
+  (void) pack_data;
+  {
+    %{body}
+  };
+  excom_buffer_destroy(&buf);
+
+GROUP protocol packet packing
+  PREFIX
+    static uint16_t id = 0;
+
+  TEST ok packet
+    .write-test-packet ok, "\0\0\0\0\0\x01\0\x01"
+
+  TEST reject packet
+    .write-test-packet reject, "\0\0\0\x01\0\x02\0\x02\x40"
+      pack_data->reason = 0x40;
+
+  TEST error packet
+    .write-test-packet error, "\0\0\0\x01\0\x03\0\x03\x38"
+      pack_data->reason = 56;
+
+  TEST protocol version packet
+    .write-test-packet protocol_version, "\0\0\0\x0c\0\x04\0\x04\0\0\0\0051.0.0\x01\0\0"
+      excom_string_init(&pack_data->version);
+      excom_string_fill(&pack_data->version, strlen("1.0.0"), "1.0.0");
+      pack_data->major = 1;
+      pack_data->minor = 0;
+      pack_data->patch = 0;
+
+  TEST command
+    .write-test-packet command, "\0\0\0\x08\0\x05\0\x05\0\0\0\004test"
+      excom_string_init(&pack_data->command);
+      excom_string_fill(&pack_data->command, strlen("test"), "test");
+
+GROUP protocol packet unpacking
+  TEST ok packet
+    .read-test-packet ok, "\0\0\0\0\0\x06\0\x01"
+
+  TEST reject packet
+    .read-test-packet reject, "\0\0\0\x01\0\x07\0\x02\x40"
+      uassert_equal(pack_data.reason, 0x40);
+
+GROUP packet management
+  TEST prefill
+    excom_packet_t packet;
+    packet.type = packet(protocol_version);
+    excom_protocol_prefill(&packet, "1.0.0", 1, 0, 0);
+
+    #define pv packet.data.protocol_version
+
+    uassert_same(pv.version.body, "1.0.0", 5);
+    uassert_equal(pv.major, 1);
+    uassert_equal(pv.minor, 0);
+    uassert_equal(pv.patch, 0);
