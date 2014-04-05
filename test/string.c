@@ -24,21 +24,21 @@ static size_t failed = 0;
         " initialization" TEXT_COLOR_MAGENTA
         "\": ");
       //before
-      #line 3 "string.test"
+      #line 4 "string.test"
 excom_string_t string;
 
-#line 4 "string.test"
+#line 5 "string.test"
 excom_string_init(&string);
 
 
       //body
-      #line 7 "string.test"
+      #line 8 "string.test"
 uassert_empty(string.size);
 
-#line 8 "string.test"
+#line 9 "string.test"
 uassert_empty(string.body);
 
-#line 9 "string.test"
+#line 10 "string.test"
 uassert_empty(string.freeable);
 
 
@@ -63,27 +63,27 @@ uassert_empty(string.freeable);
         " filling" TEXT_COLOR_MAGENTA
         "\": ");
       //before
-      #line 3 "string.test"
+      #line 4 "string.test"
 excom_string_t string;
 
-#line 4 "string.test"
+#line 5 "string.test"
 excom_string_init(&string);
 
 
-#line 13 "string.test"
+#line 14 "string.test"
 char str[] = "hello world";
 
-#line 14 "string.test"
+#line 15 "string.test"
 excom_string_fill(&string, strlen(str), str);
 
       //body
-      #line 15 "string.test"
+      #line 16 "string.test"
 uassert_equal(string.body, str);
 
-#line 16 "string.test"
+#line 17 "string.test"
 uassert_equal(string.size, strlen(str));
 
-#line 17 "string.test"
+#line 18 "string.test"
 uassert_empty(string.freeable);
 
 
@@ -108,30 +108,30 @@ uassert_empty(string.freeable);
         " free mark" TEXT_COLOR_MAGENTA
         "\": ");
       //before
-      #line 3 "string.test"
+      #line 4 "string.test"
 excom_string_t string;
 
-#line 4 "string.test"
+#line 5 "string.test"
 excom_string_init(&string);
 
 
       //body
-      #line 20 "string.test"
+      #line 21 "string.test"
 uassert_empty(string.freeable);
 
-#line 21 "string.test"
+#line 22 "string.test"
 excom_string_freeable(&string);
 
-#line 22 "string.test"
+#line 23 "string.test"
 uassert(string.freeable);
 
-#line 23 "string.test"
+#line 24 "string.test"
 uassert(excom_string_isfreeable(&string));
 
-#line 24 "string.test"
+#line 25 "string.test"
 excom_string_unfreeable(&string);
 
-#line 25 "string.test"
+#line 26 "string.test"
 uassert_empty(string.freeable);
 
 
@@ -156,39 +156,39 @@ uassert_empty(string.freeable);
         " duplication" TEXT_COLOR_MAGENTA
         "\": ");
       //before
-      #line 3 "string.test"
+      #line 4 "string.test"
 excom_string_t string;
 
-#line 4 "string.test"
+#line 5 "string.test"
 excom_string_init(&string);
 
 
-#line 29 "string.test"
+#line 30 "string.test"
 char str[] = "hello world";
 
-#line 30 "string.test"
+#line 31 "string.test"
 excom_string_fill(&string, strlen(str), str);
 
       //body
-      #line 31 "string.test"
+      #line 32 "string.test"
 excom_string_t out;
 
-#line 32 "string.test"
+#line 33 "string.test"
 excom_string_dup(&string, &out);
 
-#line 33 "string.test"
+#line 34 "string.test"
 uassert_equal(string.size, out.size);
 
-#line 34 "string.test"
+#line 35 "string.test"
 uassert_same(string.body, out.body, out.size);
 
-#line 35 "string.test"
+#line 36 "string.test"
 uassert(out.freeable);
 
-#line 36 "string.test"
+#line 37 "string.test"
 uassert_empty(out.body[out.size]);
 
-#line 37 "string.test"
+#line 38 "string.test"
 free(out.body);
 
       //after

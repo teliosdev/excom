@@ -36,4 +36,4 @@ GROUP string management
     uassert(out.freeable);
     uassert_empty(out.body[out.size]);
     free(out.body);
-}#
+#}
