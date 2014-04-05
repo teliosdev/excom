@@ -27,28 +27,28 @@ static size_t failed = 0;
         " initialization" TEXT_COLOR_MAGENTA
         "\": ");
       //before
-      #line 5 "buffer.test" 
+      #line 6 "buffer.test"
 excom_buffer_t buffer;
 
-#line 6 "buffer.test" 
+#line 7 "buffer.test"
 excom_buffer_init(&buffer, 32);
 
       //body
-      #line 11 "buffer.test" 
+      #line 12 "buffer.test"
 uassert_equal(buffer.max, 32);
 
-#line 12 "buffer.test" 
+#line 13 "buffer.test"
 uassert_equal(buffer.used, 0);
 
-#line 13 "buffer.test" 
+#line 14 "buffer.test"
 uassert(buffer.buf);
 
-#line 14 "buffer.test" 
+#line 15 "buffer.test"
 uassert_equal(buffer.buf, buffer.pos);
 
 
       //after
-      #line 8 "buffer.test" 
+      #line 9 "buffer.test"
 excom_buffer_destroy(&buffer);
 
 
@@ -71,34 +71,34 @@ excom_buffer_destroy(&buffer);
         " C String appending" TEXT_COLOR_MAGENTA
         "\": ");
       //before
-      #line 5 "buffer.test" 
+      #line 6 "buffer.test"
 excom_buffer_t buffer;
 
-#line 6 "buffer.test" 
+#line 7 "buffer.test"
 excom_buffer_init(&buffer, 32);
 
       //body
-      #line 17 "buffer.test" 
+      #line 18 "buffer.test"
 memset(buffer.buf, 0xdd, 31);
 
-#line 18 "buffer.test" 
+#line 19 "buffer.test"
 uassert_empty(
 
-#line 19 "buffer.test" 
+#line 20 "buffer.test"
   excom_buffer_cappend(&buffer, "only this gets appended", 4)
 
-#line 20 "buffer.test" 
+#line 21 "buffer.test"
 );
 
-#line 21 "buffer.test" 
+#line 22 "buffer.test"
 uassert_equal(buffer.used, 4);
 
-#line 22 "buffer.test" 
+#line 23 "buffer.test"
 uassert_same(buffer.buf, "only\xdd", 5);
 
 
       //after
-      #line 8 "buffer.test" 
+      #line 9 "buffer.test"
 excom_buffer_destroy(&buffer);
 
 
@@ -121,39 +121,39 @@ excom_buffer_destroy(&buffer);
         " excom string appended" TEXT_COLOR_MAGENTA
         "\": ");
       //before
-      #line 5 "buffer.test" 
+      #line 6 "buffer.test"
 excom_buffer_t buffer;
 
-#line 6 "buffer.test" 
+#line 7 "buffer.test"
 excom_buffer_init(&buffer, 32);
 
       //body
-      #line 25 "buffer.test" 
+      #line 26 "buffer.test"
 excom_string_t str;
 
-#line 26 "buffer.test" 
+#line 27 "buffer.test"
 excom_string_init(&str);
 
-#line 27 "buffer.test" 
+#line 28 "buffer.test"
 excom_string_fill(&str, sizeof("hello"), "hello");
 
 
-#line 29 "buffer.test" 
+#line 30 "buffer.test"
 uassert_empty(excom_buffer_sappend(&buffer, &str));
 
 
-#line 31 "buffer.test" 
+#line 32 "buffer.test"
 uassert_equal(buffer.used, sizeof("hello"));
 
-#line 32 "buffer.test" 
+#line 33 "buffer.test"
 uassert_same(buffer.buf, "hello", sizeof("hello") - 1);
 
-#line 33 "buffer.test" 
+#line 34 "buffer.test"
 buffer.used = 0;
 
 
       //after
-      #line 8 "buffer.test" 
+      #line 9 "buffer.test"
 excom_buffer_destroy(&buffer);
 
 
@@ -176,55 +176,55 @@ excom_buffer_destroy(&buffer);
         " buffer appending" TEXT_COLOR_MAGENTA
         "\": ");
       //before
-      #line 5 "buffer.test" 
+      #line 6 "buffer.test"
 excom_buffer_t buffer;
 
-#line 6 "buffer.test" 
+#line 7 "buffer.test"
 excom_buffer_init(&buffer, 32);
 
       //body
-      #line 36 "buffer.test" 
+      #line 37 "buffer.test"
 excom_buffer_t buf;
 
-#line 37 "buffer.test" 
+#line 38 "buffer.test"
 uassert_empty(excom_buffer_init(&buf, 16));
 
-#line 38 "buffer.test" 
+#line 39 "buffer.test"
 uassert_empty(
 
-#line 39 "buffer.test" 
+#line 40 "buffer.test"
   excom_buffer_cappend(&buf, "hello world", 11)
 
-#line 40 "buffer.test" 
+#line 41 "buffer.test"
 );
 
 
-#line 42 "buffer.test" 
+#line 43 "buffer.test"
 uassert_empty(excom_buffer_bappend(&buffer, &buf));
 
 
-#line 44 "buffer.test" 
+#line 45 "buffer.test"
 uassert_equal(buffer.used, 11);
 
-#line 45 "buffer.test" 
+#line 46 "buffer.test"
 uassert_same(buffer.buf, "hello world", 11);
 
 
-#line 47 "buffer.test" 
+#line 48 "buffer.test"
 excom_buffer_destroy(&buf);
 
-#line 48 "buffer.test" 
+#line 49 "buffer.test"
 uassert_equal(buf.max, 0);
 
-#line 49 "buffer.test" 
+#line 50 "buffer.test"
 uassert_equal(buf.used, 0);
 
-#line 50 "buffer.test" 
+#line 51 "buffer.test"
 buffer.used = 0;
 
 
       //after
-      #line 8 "buffer.test" 
+      #line 9 "buffer.test"
 excom_buffer_destroy(&buffer);
 
 
@@ -247,34 +247,34 @@ excom_buffer_destroy(&buffer);
         " formatting" TEXT_COLOR_MAGENTA
         "\": ");
       //before
-      #line 5 "buffer.test" 
+      #line 6 "buffer.test"
 excom_buffer_t buffer;
 
-#line 6 "buffer.test" 
+#line 7 "buffer.test"
 excom_buffer_init(&buffer, 32);
 
       //body
-      #line 53 "buffer.test" 
+      #line 54 "buffer.test"
 uassert_empty(
 
-#line 54 "buffer.test" 
+#line 55 "buffer.test"
   excom_buffer_format(&buffer, "hello %s", "world")
 
-#line 55 "buffer.test" 
+#line 56 "buffer.test"
 );
 
-#line 56 "buffer.test" 
+#line 57 "buffer.test"
 uassert_equal(buffer.used, 11);
 
-#line 57 "buffer.test" 
+#line 58 "buffer.test"
 uassert_same(buffer.buf, "hello world", 11);
 
-#line 58 "buffer.test" 
+#line 59 "buffer.test"
 buffer.used = 0;
 
 
       //after
-      #line 8 "buffer.test" 
+      #line 9 "buffer.test"
 excom_buffer_destroy(&buffer);
 
 
@@ -297,41 +297,41 @@ excom_buffer_destroy(&buffer);
         " force resize" TEXT_COLOR_MAGENTA
         "\": ");
       //before
-      #line 5 "buffer.test" 
+      #line 6 "buffer.test"
 excom_buffer_t buffer;
 
-#line 6 "buffer.test" 
+#line 7 "buffer.test"
 excom_buffer_init(&buffer, 32);
 
       //body
-      #line 61 "buffer.test" 
+      #line 62 "buffer.test"
 char str[] = "FohtnIBgPs5leGO20d24VvP8HvPStP1NWFopdUQuZyJHnosyh6SPUEHb9KFp4hxk9VpWITOb7BhxIkV6";
 
 
-#line 63 "buffer.test" 
+#line 64 "buffer.test"
 uassert_empty(
 
-#line 64 "buffer.test" 
+#line 65 "buffer.test"
   excom_buffer_cappend(&buffer, str, strlen(str) - 1)
 
-#line 65 "buffer.test" 
+#line 66 "buffer.test"
 );
 
-#line 66 "buffer.test" 
+#line 67 "buffer.test"
 uassert_equal(buffer.max, 128);
 
-#line 67 "buffer.test" 
+#line 68 "buffer.test"
 uassert_equal(buffer.used, strlen(str) - 1);
 
-#line 68 "buffer.test" 
+#line 69 "buffer.test"
 uassert_same(buffer.buf, str, strlen(str) - 1);
 
-#line 69 "buffer.test" 
+#line 70 "buffer.test"
 buffer.used = 0;
 
 
       //after
-      #line 8 "buffer.test" 
+      #line 9 "buffer.test"
 excom_buffer_destroy(&buffer);
 
 
@@ -354,50 +354,50 @@ excom_buffer_destroy(&buffer);
         " writing buffers" TEXT_COLOR_MAGENTA
         "\": ");
       //before
-      #line 5 "buffer.test" 
+      #line 6 "buffer.test"
 excom_buffer_t buffer;
 
-#line 6 "buffer.test" 
+#line 7 "buffer.test"
 excom_buffer_init(&buffer, 32);
 
       //body
-      #line 72 "buffer.test" 
+      #line 73 "buffer.test"
 int fds[2];
 
-#line 73 "buffer.test" 
+#line 74 "buffer.test"
 ssize_t bytes;
 
-#line 74 "buffer.test" 
+#line 75 "buffer.test"
 char buff[32];
 
 
-#line 76 "buffer.test" 
+#line 77 "buffer.test"
 uassert_empty(excom_buffer_reset(&buffer));
 
 
-#line 78 "buffer.test" 
+#line 79 "buffer.test"
 uassert_empty(pipe(fds));
 
-#line 79 "buffer.test" 
+#line 80 "buffer.test"
 excom_buffer_cappend(&buffer, "hello world", 11);
 
 
-#line 81 "buffer.test" 
+#line 82 "buffer.test"
 excom_buffer_write(&buffer, fds[1]);
 
 
-#line 83 "buffer.test" 
+#line 84 "buffer.test"
 bytes = read(fds[0], buff, 11);
 
 
-#line 85 "buffer.test" 
+#line 86 "buffer.test"
 uassert(bytes == 11);
 
-#line 86 "buffer.test" 
+#line 87 "buffer.test"
 uassert_same(buff, "hello world", 11);
 
       //after
-      #line 8 "buffer.test" 
+      #line 9 "buffer.test"
 excom_buffer_destroy(&buffer);
 
 

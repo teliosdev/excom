@@ -1,3 +1,4 @@
+#{
 MACRO write-test-packet name, fill, &body
   id += 1;
   excom_buffer_t buffer;
@@ -86,3 +87,4 @@ GROUP packet management
     uassert_equal(pv.major, 1);
     uassert_equal(pv.minor, 0);
     uassert_equal(pv.patch, 0);
+#}

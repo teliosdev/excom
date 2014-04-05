@@ -99,6 +99,7 @@ class Test
   def parse
     @groups = groups = []
     until @scanner.eos? || @scanner.check(/[ \t]*\z/)
+      @line += 1 if @scanner.scan(/^\#.*?\n/)
       groups << parse_group
     end
   end
@@ -121,7 +122,7 @@ class Test
       elsif @scanner.scan(/^[ \t]{#{indent+2}}([^\n]*\n+)/)
         group[:body] << [@line, @scanner[1]]
         @line += @scanner[1].gsub(/\A[^\n]*/, "").length
-      elsif @scanner.scan(/^[ \t]{#{indent+2}}?\n/)
+      elsif @scanner.scan(/^[ \t]{#{indent+2}}?\n/) || @scanner.scan(/^\#.*?\n/)
         @line += 1
       else
         break
@@ -143,7 +144,7 @@ class Test
       elsif @scanner.scan(/^[ \t]{#{indent+2}}([^\n]*\n+)/)
         @line += @scanner[1].gsub(/\A[^\n]*/, "").length
         body << @scanner[1]
-      elsif @scanner.scan(/^[ \t]{#{indent+2}}?\n/)
+      elsif @scanner.scan(/^[ \t]{#{indent+2}}?\n/) || @scanner.scan(/^\#.*?\n/)
         @line += 1
       else
         break
@@ -208,7 +209,7 @@ class Test
   end
 
   def body_of(b)
-    b.map { |x| "#line #{x[0]} \"#{@file.basename}\" \n#{x[1]}" }.join("\n")
+    b.map { |x| "#line #{x[0]} \"#{@file.basename}\"\n#{x[1]}" }.join("\n")
   end
 end
 

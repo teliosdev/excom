@@ -1,3 +1,4 @@
+#{
 GROUP buffer management
   PREFIX
     int excom_buffer_write(excom_buffer_t*, int);
@@ -84,3 +85,4 @@ GROUP buffer management
 
     uassert(bytes == 11);
     uassert_same(buff, "hello world", 11);
+#}
