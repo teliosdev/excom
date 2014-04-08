@@ -2,15 +2,16 @@ CFLAGS  += -std=c99 -fno-builtin -g3 -Wall -Wextra -fPIC -iquote$(CURDIR)/inc $(
 LDFLAGS += -L$(CURDIR) -pthread -lexcom -ltoml
 RM ?= rm -f
 CURDIR ?= `pwd`
+SODIUM_VERSION = 0.4.5
 
 OBJS := src/excom/server.o src/excom/string.o src/excom/thread.o  \
-  src/excom/factory.o src/excom/event.o src/excom/server/client.o \
-  src/excom/client.o src/excom/buffer.o src/excom/event/epoll.o   \
-  src/excom/event/kqueue.o src/excom/protocol.o                   \
-  src/excom/protocol/pack.o
+	src/excom/factory.o src/excom/event.o src/excom/server/client.o \
+	src/excom/client.o src/excom/buffer.o src/excom/event/epoll.o   \
+	src/excom/event/kqueue.o src/excom/protocol.o                   \
+	src/excom/protocol/pack.o
 TESTOBJS:= test/string.out test/buffer.out test/protocol.out
 BINOJBS := src/excom-server/client.c src/excom-client/client.c    \
-  src/excom-cli/main.o
+	src/excom-cli/main.o
 
 CFLAGS  += -I$(CURDIR)/lib/toml
 
@@ -22,6 +23,21 @@ cdt: clean default test
 
 libexcom.a: $(OBJS)
 	$(AR) r $@ $?
+	
+libsodium.a: lib/sodium
+	cp -R lib/sodium/include/* inc
+	cp lib/sodium/lib/libsodium.a .
+	
+lib/sodium: libsodium-$(SODIUM_VERSION)
+	cd libsodium-$(SODIUM_VERSION) && ./configure --prefix=$(CURDIR)/lib/sodium
+	make -C libsodium-$(SODIUM_VERSION)
+	make -C libsodium-$(SODIUM_VERSION) install
+	
+libsodium-$(SODIUM_VERSION): libsodium-$(SODIUM_VERSION).tar.gz
+	tar xvf $<
+
+libsodium-$(SODIUM_VERSION).tar.gz:
+	wget "https://download.libsodium.org/libsodium/releases/libsodium-$(SODIUM_VERSION).tar.gz
 
 libtoml.so:
 	cd $(CURDIR)/lib/toml && autoconf && ./configure CFLAGS=-fPIC && make
@@ -34,7 +50,8 @@ test: libexcom.a $(TESTOBJS)
 	@./test/run_tests ./test
 
 clean:
-	$(RM) $(OBJS) $(TESTOBJS) libexcom.a excom
+	$(RM) -r $(OBJS) $(TESTOBJS) libexcom.a excom lib/sodium libsodium-$(SODIUM_VERSION) \
+	  libsodium-$(SODIUM_VERSION).tar.gz inc/sodium inc/sodium.h
 
 inc/excom.h: inc/excom/protocol/packets.def
 
