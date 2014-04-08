@@ -1,0 +1,4 @@
+#ifndef _EXCOM_ENCRYPTION_H
+#define _EXCOM_ENCRYPTION_H
+
+#endif
