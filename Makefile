@@ -45,7 +45,7 @@ libtoml.so:
 	cd $(CURDIR)/lib/toml && autoconf && ./configure CFLAGS=-fPIC && make
 	cp lib/toml/libtoml.so libtoml.so
 
-excom.out: libexcom.a libsodium.a libtoml.so $(BINOJBS)
+excom.out: libsodium.a libexcom.a libtoml.so $(BINOJBS)
 	$(CC) -o $@ $(CFLAGS) $(LDFLAGS) $(BINOJBS) -lexcom -ltoml -lsodium
 
 test: libexcom.a $(TESTOBJS)
