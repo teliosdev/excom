@@ -1,10 +1,5 @@
 #include "excom.h"
 
-enum client_state {
-  CLIENT_STATE_PRESHAKE = 0u,
-  CLIENT_STATE_PREENC,
-  CLIENT_STATE_BODY
-};
 
 typedef struct client_data
 {
@@ -13,6 +8,7 @@ typedef struct client_data
   excom_buffer_t inbuf;
   excom_encrypt_t keys;
   excom_packet_t* packets;
+  excom_packet_t* last;
   excom_mutex_t mutex;
   excom_cond_t cond;
   excom_thread_t thread;
@@ -33,11 +29,11 @@ void excom_server_client_connect(excom_event_t event,
   excom_string_t str;
   excom_packet_t version;
 
-  printf("[excom] server: Client connected\n");
+  printf("[excom] server: Client connected (%d)\n", client->event.fd);
 
   client->data = excom_malloc(sizeof(client_data_t));
 
-  client_data->state = CLIENT_STATE_PRESHAKE;
+  client_data->state = EXCOM_PROTOCOL_STATE_PREHANDSHAKE;
   excom_buffer_init(&client_data->outbuf, 16);
   excom_buffer_init(&client_data->inbuf, 16);
   excom_mutex_init(&client_data->mutex);
@@ -46,6 +42,7 @@ void excom_server_client_connect(excom_event_t event,
   excom_string_init(&str);
   client_data->disconnected = false;
   client_data->packets = NULL;
+  client_data->last  = NULL;
 
   excom_thread_init(&client_data->thread, worker, client);
 
@@ -74,7 +71,6 @@ void excom_server_client_read(excom_event_t event,
   while(err == 0 && client_data && !client_data->disconnected)
   {
     out = read(event.fd, buf, 32);
-    printf(" (out: %d err: %d errno: %d) ", out, err, errno);
 
     if(out > 0)
     {
@@ -84,13 +80,19 @@ void excom_server_client_read(excom_event_t event,
     {
       err = errno;
     }
+    else if(out == 0)
+    {
+      excom_server_client_close(event, client);
+      close(event.fd);
+      return;
+    }
     else
     {
       err = -1;
     }
   }
 
-  if(out == -1)
+  if(err == EAGAIN || err == EWOULDBLOCK)
   {
     check_packet(client);
   }
@@ -102,7 +104,10 @@ void excom_server_client_write(excom_event_t event,
   (void) event;
   (void) client;
 
-  excom_buffer_write(&client_data->outbuf, client->event.fd);
+  if(client_data && !client_data->disconnected)
+  {
+    excom_buffer_write(&client_data->outbuf, client->event.fd);
+  }
 }
 
 void excom_server_client_error(excom_event_t event,
@@ -116,8 +121,12 @@ void excom_server_client_close(excom_event_t event,
   excom_server_client_t* client)
 {
   excom_packet_t* packet, *next;
+  int err;
   (void) event;
   (void) client;
+
+  if(client_data->disconnected)
+    return;
 
   excom_buffer_destroy(&client_data->inbuf);
   excom_buffer_destroy(&client_data->outbuf);
@@ -143,6 +152,9 @@ void excom_server_client_close(excom_event_t event,
   free(client_data);
   client->data = NULL;
 
+  err = excom_event_remove(&client->server->base, event.root);
+  excom_check_error(err, 0, "excom_event_remove");
+
   printf("[excom] server: Client disconnected\n");
 }
 
@@ -151,50 +163,51 @@ static void check_packet(excom_server_client_t* client)
   excom_packet_t* packet;
   uint32_t size;
   int err;
-  printf("mutex...\n");
-  excom_mutex_lock(&client_data->inbuf.mutex);
-
 
   // We need to at least have 4 bytes to read.  The four bytes should
   // represent the size of what is to come.
-  if(excom_buffer_remaining(&client_data->inbuf) < 4)
-  {
-    excom_mutex_unlock(&client_data->inbuf.mutex);
-    return;
-  }
-
-  printf("size...\n");
-
-  excom_protocol_unpack_uint32_t((char*) client_data->inbuf.pos, &size);
-
-  // The entire packet hasn't come through yet, so we need to wait
-  // until it does.
-  if(excom_buffer_remaining(&client_data->inbuf) < 4 + size)
-  {
-    excom_mutex_unlock(&client_data->inbuf.mutex);
-    return;
-  }
-  printf("data...\n");
-
-  packet = excom_malloc(sizeof(excom_packet_t));
-  err = excom_protocol_read_packet(packet, &client_data->inbuf);
-  excom_mutex_unlock(&client_data->inbuf.mutex);
-
-  printf("body...\n");
-
-  if(err)
-  {
-    excom_check_error(err, 0, "read_packet");
-    excom_free(packet);
-    return;
-  }
 
   excom_mutex_lock(&client_data->mutex);
-  packet->_next = client_data->packets;
-  client_data->packets = packet;
-  excom_mutex_unlock(&client_data->mutex);
+  while(excom_buffer_remaining(&client_data->inbuf) > 4)
+  {
+    excom_mutex_lock(&client_data->inbuf.mutex);
 
+    excom_protocol_unpack_uint32_t((char*) client_data->inbuf.pos, &size);
+
+    // The entire packet hasn't come through yet, so we need to wait
+    // until it does.
+    if(excom_buffer_remaining(&client_data->inbuf) < 4 + size)
+    {
+      break;
+    }
+
+    packet = excom_malloc(sizeof(excom_packet_t));
+    err = excom_protocol_read_packet(packet, &client_data->inbuf);
+    excom_mutex_unlock(&client_data->inbuf.mutex);
+
+    if(err)
+    {
+      excom_check_error(err, 0, "read_packet");
+      excom_free(packet);
+      break;
+    }
+
+    if(client_data->packets == NULL)
+    {
+      client_data->packets = client_data->last = packet;
+      packet->_next = NULL;
+    }
+    else
+    {
+      client_data->last->_next = packet;
+      client_data->last = packet;
+      packet->_next = NULL;
+    }
+  }
+
+  excom_mutex_unlock(&client_data->mutex);
   excom_cond_signal(&client_data->cond);
+  excom_mutex_unlock(&client_data->inbuf.mutex);
 }
 
 static void* worker(void* cl)
@@ -209,45 +222,45 @@ static void* worker(void* cl)
 
     packet = client_data->packets;
 
-    if(packet != NULL)
-    {
-      client_data->packets = packet->_next;
-    }
-
-    excom_mutex_unlock(&client_data->mutex);
-
     if(client_data->disconnected)
     {
       break;
     }
 
-    if(packet == NULL)
+    excom_mutex_unlock(&client_data->mutex);
+
+    while(packet)
     {
-      continue;
+      client_data->packets = packet->_next;
+
+      if(client_data->packets == NULL)
+      {
+        client_data->last = NULL;
+      }
+
+      #define PACKET(name, __, ___)                              \
+        case packet(name):                                       \
+          printf("[excom-server] Recieved %s packet!\n", #name); \
+          handle_packet_##name(client_data, packet);             \
+          printf("[excom-server] Done handling %s.\n", #name);   \
+          break;
+
+      printf("checking packet!\n");
+
+      switch(packet->type)
+      {
+        #include "excom/protocol/packets.def"
+        case packet(INVALID):
+        default:
+          printf("[excom-server] Recieved invalid packet type %d!\n",
+            packet->type);
+          break;
+        #undef PACKET
+      }
+
+      packet = client_data->packets;
     }
 
-#   define PACKET(name, __, ___)                               \
-      case packet(name):                                       \
-        printf("[excom-server] Recieved %s packet!\n", #name); \
-        handle_packet_##name(client_data, packet);             \
-        printf("[excom-server] Done handling %s.\n", #name);   \
-        break;
-
-    printf("checking packet!\n");
-
-    switch(packet->type)
-    {
-#     include "excom/protocol/packets.def"
-      case packet(INVALID):
-      default:
-        printf("[excom-server] Recieved invalid packet type %d!\n",
-          packet->type);
-        break;
-    }
-
-#   undef PACKET
-
-    excom_free(packet);
   }
 
   excom_thread_exit(NULL);

@@ -7,8 +7,9 @@ SODIUM_VERSION = 0.5.0
 OBJS := src/excom/server.o src/excom/string.o src/excom/thread.o  \
 	src/excom/factory.o src/excom/event.o src/excom/server/client.o \
 	src/excom/client.o src/excom/buffer.o src/excom/event/epoll.o   \
-	src/excom/event/kqueue.o src/excom/protocol.o                   \
-	src/excom/protocol/pack.o src/excom/encryption.o
+	src/excom/event/kqueue.o src/excom/event/poll.o                 \
+	src/excom/protocol.o src/excom/protocol/pack.o                  \
+	src/excom/encryption.o
 TESTOBJS:= test/string.out test/buffer.out test/protocol.out
 BINOJBS := src/excom-server/client.c src/excom-client/client.c    \
 	src/excom-cli/main.o

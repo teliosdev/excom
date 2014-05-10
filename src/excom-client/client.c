@@ -114,6 +114,15 @@ static void check_packet(excom_client_t* client)
   client->handler(packet, client);
 }
 
+static void clwrite(excom_event_t event,
+  excom_client_t* client)
+{
+  (void) event;
+
+  excom_buffer_write(&client->buf.out, client->sock);
+}
+
+
 static void clread(excom_event_t event,
   excom_client_t* client)
 {
@@ -141,18 +150,10 @@ static void clread(excom_event_t event,
     }
   }
 
-  if(errno != 0)
+  if(err == EAGAIN || err == EWOULDBLOCK)
   {
     check_packet(client);
   }
-}
-
-static void clwrite(excom_event_t event,
-  excom_client_t* client)
-{
-  (void) event;
-
-  excom_buffer_write(&client->buf.out, client->sock);
 }
 
 static void clerror(excom_event_t event,
@@ -197,6 +198,7 @@ static void event_listener(excom_event_t event, void* ptr)
 
   if(event.flags & EXCOM_EVENT_READ)
   {
+    printf("EXCOM EVENT READ\n");
     clread(event, client);
   }
 
@@ -207,11 +209,13 @@ static void event_listener(excom_event_t event, void* ptr)
 
   if(event.flags & EXCOM_EVENT_CLOSE)
   {
+    printf("EXCOM EVENT CLOSE\n");
     clclose(event, client);
   }
 
   if(event.flags & EXCOM_EVENT_ERROR)
   {
+    printf("EXCOM EVENT ERROR\n");
     clerror(event, client);
   }
 }

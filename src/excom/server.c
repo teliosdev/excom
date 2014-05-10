@@ -68,7 +68,7 @@ int excom_server_bind(excom_server_t* server)
   size_t len = sizeof(bool);
   struct sockaddr_in name;
 
-  server->sock = socket(PF_INET, SOCK_STREAM, 0);
+  server->sock = socket(AF_INET, SOCK_STREAM, 0);
   ERROR_CHECK(server->sock);
 
   name.sin_family      = AF_INET;
@@ -77,6 +77,7 @@ int excom_server_bind(excom_server_t* server)
 
   err = bind(server->sock, (struct sockaddr*) &name, sizeof(name));
   ERROR_CHECK(err);
+  printf("server: %d\n", server->sock);
 
   err = listen(server->sock, 128);
   ERROR_CHECK(err);
@@ -115,6 +116,13 @@ static void _accept(excom_event_t event, excom_server_t* server)
     client->event.flags = EXCOM_EVENT_READ | EXCOM_EVENT_WRITE |
       EXCOM_EVENT_ERROR | EXCOM_EVENT_CLOSE;
     client->event.data  = client;
+    client->_prev       = server->clients;
+    client->_next       = NULL;
+
+    if(server->clients)
+    {
+      server->clients->_next = client;
+    }
     err = socket_non_blocking(err);
     if(err < 0)
     {
@@ -201,6 +209,7 @@ static void on_event(excom_event_t event, void* ptr)
     }
     if(event.flags & EXCOM_EVENT_CLOSE)
     {
+      printf("EXCOM EVENT CLOSE\n");
       excom_server_client_close(event, event.data);
       _disconnect(event, server);
     }

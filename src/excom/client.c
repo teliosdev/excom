@@ -66,7 +66,7 @@ int excom_client_connect(excom_client_t* client)
   excom_string_t str;
   excom_packet_t version;
 
-  client->sock = socket(PF_INET, SOCK_STREAM, 0);
+  client->sock = socket(AF_INET, SOCK_STREAM, 0);
   ERROR_CHECK(client->sock);
 
   he = gethostbyname(client->addr);

@@ -37,7 +37,7 @@ typedef void (excom_event_runner_t)(excom_event_t, void*);
 #undef EXCOM_USE_POLL
 #undef EXCOM_USE_SELECT
 
-#if defined(EXCOM_EPOLL) || defined(EXCOM_HAVE_SYS_EPOLL_H)
+#  if defined(EXCOM_EPOLL) || defined(EXCOM_HAVE_SYS_EPOLL_H)
 #  define EXCOM_USE_EPOLL
 #  include "excom/event/epoll.h"
 #elif defined(EXCOM_KQUEUE) || defined(EXCOM_HAVE_SYS_EVENT_H)
@@ -63,8 +63,8 @@ int excom_event_base_init(struct excom_event_base* base,
 int excom_event_add(struct excom_event_base* base,
   struct excom_event* event);
 
-int excom_event_remove(excom_event_base_t* base,
-  excom_event_t* event);
+int excom_event_remove(struct excom_event_base* base,
+  struct excom_event* event);
 
 void excom_event_loop(struct excom_event_base* base, void* ptr);
 

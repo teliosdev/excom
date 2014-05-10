@@ -1,6 +1,7 @@
 #include "excom.h"
 #include <ctype.h>
 
+
 int excom_buffer_init(excom_buffer_t* buffer, size_t start)
 {
   buffer->_init = buffer->max = start;
@@ -245,7 +246,7 @@ void excom_buffer_inspect(excom_buffer_t* buffer)
   {
     if((buffer->buf + i) == buffer->pos)
     {
-      printf("| %02x", buffer->buf[i]);
+      printf("\e[0;1;34m|\e[0m %02x", buffer->buf[i]);
     }
     else
     {
@@ -256,8 +257,17 @@ void excom_buffer_inspect(excom_buffer_t* buffer)
     {
       printf("(%c)", buffer->buf[i]);
     }
+    else
+    {
+      printf("( )");
+    }
 
     printf(" ");
+  }
+
+  if((buffer->buf + buffer->used) == buffer->pos)
+  {
+    printf("\e[0;1;34m|\e[0m");
   }
 
   excom_mutex_unlock(&buffer->mutex);
@@ -283,6 +293,7 @@ int excom_buffer_write(excom_buffer_t* buffer,
   if(excom_buffer_remaining(buffer) != 0)
   {
     printf("[excom] writing buffer!\n");
+    excom_buffer_inspect(buffer);
     excom_mutex_lock(&buffer->mutex);
     to_write = excom_buffer_remaining(buffer);
     written = write(sock, buffer->pos, to_write);
@@ -309,6 +320,7 @@ int excom_buffer_write(excom_buffer_t* buffer,
     }
 
     err = excom_mutex_unlock(&buffer->mutex);
+    excom_buffer_inspect(buffer);
   }
 
   return err;
