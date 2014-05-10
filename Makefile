@@ -32,7 +32,7 @@ libsodium.a: libsodium-$(SODIUM_VERSION)
 	cp libsodium-$(SODIUM_VERSION)/src/libsodium/.libs/libsodium.a .
 
 libsodium-$(SODIUM_VERSION):
-	git clone git@github.com:jedisct1/libsodium.git
+	git clone https://github.com/jedisct1/libsodium.git
 	mv libsodium libsodium-$(SODIUM_VERSION)
 
 #libsodium-$(SODIUM_VERSION): libsodium-$(SODIUM_VERSION).tar.gz
