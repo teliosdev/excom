@@ -9,10 +9,57 @@
   b;                                  \
 }
 
-handle(ok, {})
-handle(reject, {})
-handle(error, {})
-handle(protocol_version, {})
-handle(ping, {})
-handle(command, {})
-handle(command_response, {})
+#define send(t, ...) do               \
+{                                     \
+  excom_packet_t _temp;               \
+  _temp.type = packet(t);             \
+  _temp.id   = raw->id;               \
+  excom_protocol_prefill(&_temp,      \
+    ##__VA_ARGS__);                   \
+  excom_protocol_write_packet(&_temp, \
+    &data->buf.out);                  \
+  printf("writing packet %s\n", #t);  \
+} while(0)
+
+#define error(reason) send(error, EXCOM_ERROR_##reason)
+#define reject(reason) send(reject, EXCOM_REJECT_##reason)
+
+#define require(level) if(data->state != EXCOM_PROTOCOL_STATE_##level) \
+  error(NOT_AVAILABLE_ERROR); return;
+
+handle(ok, {
+
+})
+
+handle(reject, {
+
+})
+
+handle(error, {
+
+})
+
+handle(public_key, {
+
+})
+
+int excom_mutex_islocked(excom_mutex_t*);
+handle(protocol_version, {
+  int t;
+  printf("HI!\n");
+  t = excom_mutex_islocked(&data->buf.out.mutex);
+  printf("Is locked: %i\n", t);
+  error(INVALID_ERROR);
+})
+
+handle(ping, {
+
+})
+
+handle(command, {
+
+})
+
+handle(command_response, {
+
+})

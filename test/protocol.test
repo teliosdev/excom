@@ -78,8 +78,11 @@ GROUP protocol packet unpacking
 GROUP packet management
   TEST prefill
     excom_packet_t packet;
+    excom_string_t str;
     packet.type = packet(protocol_version);
-    excom_protocol_prefill(&packet, "1.0.0", 1, 0, 0);
+    excom_string_init(&str);
+    excom_string_fill(&str, sizeof("1.0.0"), "1.0.0");
+    excom_protocol_prefill(&packet, &str, 1, 0, 0);
 
     #define pv packet.data.protocol_version
 

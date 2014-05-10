@@ -46,6 +46,14 @@ PACKET(
 )
 
 PACKET(
+  public_key,
+  0x06,
+  {
+    string(key)
+  }
+)
+
+PACKET(
   command,
   0x10,
   {

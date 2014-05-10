@@ -46,7 +46,7 @@ static void default_handler(excom_packet_t* packet,
     case packet(name):                                     \
     printf("[excom-client] Recieved %s packet!\n", #name); \
     handle_packet_##name(cl, packet);                      \
-    printf("[excom-client] Done handling %s\n.", #name);   \
+    printf("[excom-client] Done handling %s.\n", #name);   \
     break;                                                 \
 
   switch(packet->type)

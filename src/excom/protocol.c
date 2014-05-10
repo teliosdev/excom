@@ -141,8 +141,8 @@ void excom_protocol_prefill(excom_packet_t* packet, ...)
 
 # define string(name) do                                \
   {                                                     \
-    char* str = va_arg(args, char*);                    \
-    excom_string_fill(&pack->name, strlen(str), str);   \
+    excom_string_t* str = va_arg(args, excom_string_t*);\
+    memcpy(&pack->name, str, sizeof(excom_string_t));   \
   } while(0);
 
 # define number(type, name) do                          \

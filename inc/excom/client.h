@@ -7,6 +7,7 @@ typedef struct excom_client {
   uint16_t port;
   char* addr;
   bool disconnected;
+  excom_protocol_state_t state;
 
   excom_event_base_t base;
   excom_thread_t thread;

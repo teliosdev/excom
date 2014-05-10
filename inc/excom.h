@@ -47,6 +47,7 @@
 #include "excom/event.h"
 #include "excom/server.h"
 #include "excom/client.h"
+#include "excom/encryption.h"
 
 #if UINTPTR_MAX == 0xffffffffffffffff
 #  define EXCOM64

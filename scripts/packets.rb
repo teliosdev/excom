@@ -19,6 +19,10 @@ end
 ping 0x05, :both do
 end
 
+public_key 0x06, :both do
+  string :key
+end
+
 command 0x10, :client do
   string :command
 end

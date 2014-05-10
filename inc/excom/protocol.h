@@ -17,6 +17,15 @@ typedef struct excom_packet
   struct excom_packet* _next;
 } excom_packet_t;
 
+typedef enum excom_protocol_state {
+  EXCOM_PROTOCOL_STATE_PREHANDSHAKE = 0u,
+  EXCOM_PROTOCOL_STATE_PREENCRYPT,
+  EXCOM_PROTOCOL_STATE_ENCRYPT,
+  EXCOM_PROTOCOL_STATE_BODY,
+  EXCOM_PROTOCOL_STATE_PRECLOSE,
+  EXCOM_PROTOCOL_STATE_INVALID
+} excom_protocol_state_t;
+
 typedef enum excom_reject_reason
 {
   EXCOM_REJECT_STANDARD_ERROR = 0x00u,
@@ -26,7 +35,10 @@ typedef enum excom_reject_reason
 typedef enum excom_error_reason
 {
   EXCOM_ERROR_STANDARD_ERROR = 0x00u,
-  EXCOM_REJECT_IMPROPER_PERMISSIONS_ERROR
+  EXCOM_ERROR_IMPROPER_PERMISSIONS_ERROR,
+  EXCOM_ERROR_INVALID_ERROR,
+  EXCOM_ERROR_NOT_AVAILABLE_ERROR,
+  EXCOM_ERROR_PUBLIC_KEY_ERROR
 } excom_error_reason_t;
 
 int excom_protocol_read_packet(excom_packet_t* packet,

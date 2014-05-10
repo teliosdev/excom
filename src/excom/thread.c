@@ -141,6 +141,27 @@ int excom_mutex_unlock(excom_mutex_t* mutex)
 #endif
 }
 
+int excom_mutex_trylock(excom_mutex_t* mutex)
+{
+#ifdef EXCOM_POSIX
+  return pthread_mutex_trylock(mutex);
+#else
+#endif
+}
+
+int excom_mutex_islocked(excom_mutex_t* mutex)
+{
+  int result;
+
+  result = excom_mutex_trylock(mutex);
+  if(result == 0)
+  {
+    excom_mutex_unlock(mutex);
+  }
+
+  return result;
+}
+
 int excom_cond_init(excom_cond_t* cond)
 {
 #ifdef EXCOM_POSIX

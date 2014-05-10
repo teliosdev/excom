@@ -20,7 +20,11 @@
     &data->outbuf);                   \
 } while(0)
 
+#define error(reason) send(error, EXCOM_ERROR_##reason)
 #define reject(reason) send(reject, EXCOM_REJECT_##reason)
+
+#define require(level) if(data->state != EXCOM_PROTOCOL_STATE_##level) \
+  error(NOT_AVAILABLE_ERROR); return;
 
 handle(ok,
 {
@@ -34,41 +38,57 @@ handle(reject,
 
 handle(error,
 {
+  printf("Recieved Error %d\n", packet.reason);
+})
 
+handle(public_key,
+{
+  excom_string_t pkey;
+  require(PREENCRYPT);
+  if(packet.key.size != crypto_box_PUBLICKEYBYTES)
+  {
+    error(PUBLIC_KEY_ERROR);
+  }
+  else
+  {
+    memcpy(packet.key.body, data->keys.remote.pkey, crypto_box_PUBLICKEYBYTES);
+    excom_string_init(&pkey);
+    excom_string_fill(&pkey, crypto_box_PUBLICKEYBYTES,
+      (char*) data->keys.local.pkey);
+    send(public_key, &pkey);
+    data->state = EXCOM_PROTOCOL_STATE_ENCRYPT;
+  }
 })
 
 handle(protocol_version,
 {
-
+  require(PREHANDSHAKE);
   if(packet.major != EXCOM_VERSION_MAJOR ||
      abs(packet.minor - EXCOM_VERSION_MINOR) > 3 ||
      abs(packet.patch - EXCOM_VERSION_PATCH) > 10) {
 
     reject(INVALID_PROTOCOL_ERROR);
   } else {
+    data->state = EXCOM_PROTOCOL_STATE_PREENCRYPT;
     send(ok);
   }
 })
 
 handle(ping,
 {
-  excom_packet_t response;
-
-  response.type = packet(ping);
-  response.id   = raw->id;
-
-  excom_protocol_prefill(&response);
-  excom_protocol_write_packet(&response, &data->outbuf);
+  send(ping);
+  if(data->state == EXCOM_PROTOCOL_STATE_ENCRYPT)
+  {
+    data->state = EXCOM_PROTOCOL_STATE_BODY;
+  }
 })
 
 handle(command,
 {
-  (void) data;
-  (void) packet;
+  require(BODY);
 })
 
 handle(command_response,
 {
-  (void) data;
-  (void) packet;
+  require(BODY);
 })

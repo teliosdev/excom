@@ -1,9 +1,17 @@
 #include "excom.h"
 
+enum client_state {
+  CLIENT_STATE_PRESHAKE = 0u,
+  CLIENT_STATE_PREENC,
+  CLIENT_STATE_BODY
+};
+
 typedef struct client_data
 {
+  excom_protocol_state_t state;
   excom_buffer_t outbuf;
   excom_buffer_t inbuf;
+  excom_encrypt_t keys;
   excom_packet_t* packets;
   excom_mutex_t mutex;
   excom_cond_t cond;
@@ -22,22 +30,28 @@ void excom_server_client_connect(excom_event_t event,
 {
   (void) event;
   (void) client;
+  excom_string_t str;
+  excom_packet_t version;
 
   printf("[excom] server: Client connected\n");
 
   client->data = excom_malloc(sizeof(client_data_t));
 
+  client_data->state = CLIENT_STATE_PRESHAKE;
   excom_buffer_init(&client_data->outbuf, 16);
   excom_buffer_init(&client_data->inbuf, 16);
   excom_mutex_init(&client_data->mutex);
   excom_cond_init(&client_data->cond);
+  excom_encrypt_init(&client_data->keys, true);
+  excom_string_init(&str);
   client_data->disconnected = false;
+  client_data->packets = NULL;
 
   excom_thread_init(&client_data->thread, worker, client);
 
-  excom_packet_t version;
+  excom_string_fill(&str, sizeof(EXCOM_VERSION), EXCOM_VERSION);
   version.type = packet(protocol_version);
-  excom_protocol_prefill(&version, EXCOM_VERSION, EXCOM_VERSION_MAJOR,
+  excom_protocol_prefill(&version, &str, EXCOM_VERSION_MAJOR,
     EXCOM_VERSION_MINOR, EXCOM_VERSION_PATCH);
   version.id = 1;
 
@@ -50,16 +64,17 @@ void excom_server_client_read(excom_event_t event,
 {
   char buf[32];
   ssize_t out;
-  int err;
+  int err = 0;
 
   (void) event;
   (void) client;
 
   errno = 0;
 
-  while(err == 0 && !client_data->disconnected)
+  while(err == 0 && client_data && !client_data->disconnected)
   {
     out = read(event.fd, buf, 32);
+    printf(" (out: %d err: %d errno: %d) ", out, err, errno);
 
     if(out > 0)
     {
@@ -75,7 +90,7 @@ void excom_server_client_read(excom_event_t event,
     }
   }
 
-  if(errno != 0)
+  if(out == -1)
   {
     check_packet(client);
   }
@@ -126,6 +141,7 @@ void excom_server_client_close(excom_event_t event,
   excom_thread_join(&client_data->thread, NULL);
 
   free(client_data);
+  client->data = NULL;
 
   printf("[excom] server: Client disconnected\n");
 }
@@ -135,8 +151,9 @@ static void check_packet(excom_server_client_t* client)
   excom_packet_t* packet;
   uint32_t size;
   int err;
-
+  printf("mutex...\n");
   excom_mutex_lock(&client_data->inbuf.mutex);
+
 
   // We need to at least have 4 bytes to read.  The four bytes should
   // represent the size of what is to come.
@@ -145,6 +162,8 @@ static void check_packet(excom_server_client_t* client)
     excom_mutex_unlock(&client_data->inbuf.mutex);
     return;
   }
+
+  printf("size...\n");
 
   excom_protocol_unpack_uint32_t((char*) client_data->inbuf.pos, &size);
 
@@ -155,10 +174,13 @@ static void check_packet(excom_server_client_t* client)
     excom_mutex_unlock(&client_data->inbuf.mutex);
     return;
   }
+  printf("data...\n");
 
   packet = excom_malloc(sizeof(excom_packet_t));
   err = excom_protocol_read_packet(packet, &client_data->inbuf);
   excom_mutex_unlock(&client_data->inbuf.mutex);
+
+  printf("body...\n");
 
   if(err)
   {

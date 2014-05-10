@@ -637,26 +637,35 @@ excom_buffer_destroy(&buf);
 excom_packet_t packet;
 
 #line 74 "protocol.test"
-packet.type = packet(protocol_version);
+excom_string_t str;
 
 #line 75 "protocol.test"
-excom_protocol_prefill(&packet, "1.0.0", 1, 0, 0);
+packet.type = packet(protocol_version);
 
+#line 76 "protocol.test"
+excom_string_init(&str);
 
 #line 77 "protocol.test"
+excom_string_fill(&str, sizeof("1.0.0"), "1.0.0");
+
+#line 78 "protocol.test"
+excom_protocol_prefill(&packet, &str, 1, 0, 0);
+
+
+#line 80 "protocol.test"
 #define pv packet.data.protocol_version
 
 
-#line 79 "protocol.test"
+#line 82 "protocol.test"
 uassert_same(pv.version.body, "1.0.0", 5);
 
-#line 80 "protocol.test"
+#line 83 "protocol.test"
 uassert_equal(pv.major, 1);
 
-#line 81 "protocol.test"
+#line 84 "protocol.test"
 uassert_equal(pv.minor, 0);
 
-#line 82 "protocol.test"
+#line 85 "protocol.test"
 uassert_equal(pv.patch, 0);
 
       //after

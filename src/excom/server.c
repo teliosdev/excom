@@ -7,6 +7,7 @@
 #  include <sys/types.h>
 #  include <sys/socket.h>
 #  include <netinet/in.h>
+#  include <netinet/tcp.h>
 #  include <netdb.h>
 #endif
 
@@ -125,6 +126,7 @@ static void _accept(excom_event_t event, excom_server_t* server)
       excom_event_add(&server->base, &client->event);
       client->_next = server->clients;
       server->clients = client;
+      excom_server_client_read(client->event, client);
     }
   }
 }
@@ -186,6 +188,7 @@ static void on_event(excom_event_t event, void* ptr)
   {
     if(event.flags & EXCOM_EVENT_READ)
     {
+      printf("EXCOM EVENT READ\n");
       excom_server_client_read(event, event.data);
     }
     if(event.flags & EXCOM_EVENT_WRITE)

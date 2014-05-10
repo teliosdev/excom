@@ -36,8 +36,9 @@ void excom_buffer_destroy(excom_buffer_t* buffer);
 
 int excom_buffer_write(excom_buffer_t* buffer, int sock);
 
-#define excom_buffer_remaining(buff) \
-  ((buff)->used - ((buff)->pos - (buff)->buf))
+static inline uintptr_t excom_buffer_remaining(excom_buffer_t* buffer) {
+  return buffer->used - (buffer->pos - (buffer)->buf);
+}
 
 
 #endif

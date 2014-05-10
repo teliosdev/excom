@@ -282,6 +282,7 @@ int excom_buffer_write(excom_buffer_t* buffer,
 
   if(excom_buffer_remaining(buffer) != 0)
   {
+    printf("[excom] writing buffer!\n");
     excom_mutex_lock(&buffer->mutex);
     to_write = excom_buffer_remaining(buffer);
     written = write(sock, buffer->pos, to_write);

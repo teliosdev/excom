@@ -21,6 +21,7 @@
     return err;               \
   }                           \
 } while(0)
+#define error if(err) { return err; }
 
 static int socket_non_blocking(int fd)
 {
@@ -62,6 +63,8 @@ int excom_client_connect(excom_client_t* client)
   struct hostent *he;
   int err;
   struct sockaddr_in name;
+  excom_string_t str;
+  excom_packet_t version;
 
   client->sock = socket(PF_INET, SOCK_STREAM, 0);
   ERROR_CHECK(client->sock);
@@ -83,19 +86,17 @@ int excom_client_connect(excom_client_t* client)
   }
 
   err = socket_non_blocking(client->sock);
-  if(err)
-  {
-    return err;
-  }
+  error;
 
   err = excom_buffer_init(&client->buf.in, 32);
-  if(err) { return err; }
+  error;
   err = excom_buffer_init(&client->buf.out, 32);
-  if(err) { return err; }
+  error;
 
-  excom_packet_t version;
+  excom_string_init(&str);
+  excom_string_fill(&str, sizeof(EXCOM_VERSION), EXCOM_VERSION);
   version.type = packet(protocol_version);
-  excom_protocol_prefill(&version, EXCOM_VERSION, EXCOM_VERSION_MAJOR,
+  excom_protocol_prefill(&version, &str, EXCOM_VERSION_MAJOR,
     EXCOM_VERSION_MINOR, EXCOM_VERSION_PATCH);
   version.id = 1;
 

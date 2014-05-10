@@ -25,8 +25,9 @@ void sighandle(int signal)
   }
 }
 
-static void pack(excom_packet_t* packet, excom_client_t* cl)
+/*static void pack(excom_packet_t* packet, excom_client_t* cl)
 {
+  (void) cl;
 # define PACKET(name, __, ___) case packet(name):             \
     printf("[excom-cli/client] Received %s packet\n", #name); \
     break;                                                    \
@@ -39,7 +40,7 @@ static void pack(excom_packet_t* packet, excom_client_t* cl)
       printf("Received invalid packet!\n");
       break;
   }
-}
+}*/
 
 int main(int argc, char* argv[])
 {
@@ -87,7 +88,7 @@ int main(int argc, char* argv[])
     excom_protocol_prefill(&p);
     excom_protocol_write_packet(&p, &client.buf.out);
     printf("[excom-cli/client-test] handling packets\n");
-    excom_client_handle_packets(&client, pack);
+    excom_client_handle_packets(&client, NULL);
     excom_thread_join(&client.thread, NULL);
   }
   else
@@ -97,7 +98,7 @@ int main(int argc, char* argv[])
     printf("[excom-cli/client] connect\n");
     assert(excom_client_connect(&client) == 0);
     printf("[excom-cli/client] handling packets\n");
-    excom_client_handle_packets(&client, pack);
+    excom_client_handle_packets(&client, NULL);
     excom_thread_join(&client.thread, NULL);
   }
 
