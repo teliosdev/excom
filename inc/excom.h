@@ -42,12 +42,12 @@
 #include "excom/string.h"
 #include "excom/thread.h"
 #include "excom/buffer.h"
+#include "excom/encryption.h"
 #include "excom/protocol.h"
 #include "excom/factory.h"
 #include "excom/event.h"
 #include "excom/server.h"
 #include "excom/client.h"
-#include "excom/encryption.h"
 
 #if UINTPTR_MAX == 0xffffffffffffffff
 #  define EXCOM64

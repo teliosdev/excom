@@ -17,29 +17,32 @@
   excom_protocol_prefill(&_temp,      \
     ##__VA_ARGS__);                   \
   excom_protocol_write_packet(&_temp, \
-    &data->outbuf);                   \
+    &data->buf.out, &data->keys);     \
 } while(0)
 
 #define error(reason) send(error, EXCOM_ERROR_##reason)
 #define reject(reason) send(reject, EXCOM_REJECT_##reason)
 
-#define require(level) if(data->state != EXCOM_PROTOCOL_STATE_##level) \
-  error(NOT_AVAILABLE_ERROR); return;
+#define require(level) if(data->state != \
+  EXCOM_PROTOCOL_STATE_##level) {        \
+  error(NOT_AVAILABLE_ERROR);            \
+  return;                                \
+}
 
 handle(ok,
 {
 
-})
+});
 
 handle(reject,
 {
 
-})
+});
 
 handle(error,
 {
   printf("Recieved Error %d\n", packet.reason);
-})
+});
 
 handle(public_key,
 {
@@ -51,14 +54,16 @@ handle(public_key,
   }
   else
   {
-    memcpy(packet.key.body, data->keys.remote.pkey, crypto_box_PUBLICKEYBYTES);
+    memcpy(packet.key.body, data->keys.remote.pkey,
+           crypto_box_PUBLICKEYBYTES);
     excom_string_init(&pkey);
     excom_string_fill(&pkey, crypto_box_PUBLICKEYBYTES,
-      (char*) data->keys.local.pkey);
+      (char*) data->keys.local->pkey);
     send(public_key, &pkey);
+    data->keys.remote.active = true;
     data->state = EXCOM_PROTOCOL_STATE_ENCRYPT;
   }
-})
+});
 
 handle(protocol_version,
 {
@@ -66,29 +71,34 @@ handle(protocol_version,
   if(packet.major != EXCOM_VERSION_MAJOR ||
      abs(packet.minor - EXCOM_VERSION_MINOR) > 3 ||
      abs(packet.patch - EXCOM_VERSION_PATCH) > 10) {
-
     reject(INVALID_PROTOCOL_ERROR);
   } else {
     data->state = EXCOM_PROTOCOL_STATE_PREENCRYPT;
     send(ok);
   }
-})
+});
 
 handle(ping,
 {
-  send(ping);
+  send(pong);
   if(data->state == EXCOM_PROTOCOL_STATE_ENCRYPT)
   {
     data->state = EXCOM_PROTOCOL_STATE_BODY;
   }
-})
+});
+
+handle(pong,
+{
+
+});
 
 handle(command,
 {
   require(BODY);
-})
+  excom_string_inspect(&packet.command);
+});
 
 handle(command_response,
 {
   require(BODY);
-})
+});

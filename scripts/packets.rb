@@ -1,32 +1,32 @@
-ok 0x01, :both do
-end
+ok(0x01, :both) {}
 
-reject 0x02, :both do
+reject(0x02, :both) do
   number :uint8_t, :reason
 end
 
-error 0x03, :both do
+error(0x03, :both) do
   number :uint8_t, :reason
 end
 
-protocol_version 0x04, :both do
+protocol_version(0x04, :both) do
   string :version
   number :uint8_t, :major
   number :uint8_t, :minor
   number :uint8_t, :patch
 end
 
-ping 0x05, :both do
-end
+ping(0x05, :both) {}
 
-public_key 0x06, :both do
+pong(0x06, :both) {}
+
+public_key(0x07, :both) do
   string :key
 end
 
-command 0x10, :client do
+command(0x10, :client) do
   string :command
 end
 
-command_response 0x11, :server do
+command_response(0x11, :server) do
   string :response
 end

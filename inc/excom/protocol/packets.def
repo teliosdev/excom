@@ -46,8 +46,16 @@ PACKET(
 )
 
 PACKET(
-  public_key,
+  pong,
   0x06,
+  {
+
+  }
+)
+
+PACKET(
+  public_key,
+  0x07,
   {
     string(key)
   }

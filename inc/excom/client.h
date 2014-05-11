@@ -8,7 +8,8 @@ typedef struct excom_client {
   char* addr;
   bool disconnected;
   excom_protocol_state_t state;
-
+  excom_encrypt_pair_t enc;
+  excom_encrypt_t keys;
   excom_event_base_t base;
   excom_thread_t thread;
   excom_mutex_t mutex;
@@ -17,8 +18,9 @@ typedef struct excom_client {
 
   struct
   {
-    excom_buffer_t in;
+    excom_buffer_t  in;
     excom_buffer_t out;
+    excom_buffer_t enc;
   } buf;
 
 } excom_client_t;

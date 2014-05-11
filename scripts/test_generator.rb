@@ -44,7 +44,7 @@ static size_t failed = 0;
       <%= (group[:subgroups] + test[:subgroups]).select { |x|
           x[:name] == "AFTER" }.map { |x| x[:body] }.map { |x|
           body_of(x) }.join("\\n") %>
-  #line 42
+  #line 47 "test_generator.rb"
       if(test_success) {
   #ifdef VERBOSE
         output("\\n\\t\\t\\t" TEXT_COLOR_GREEN "OK\\n");

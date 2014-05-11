@@ -17,6 +17,17 @@ void excom_string_fill(excom_string_t* string, uint32_t size,
   string->body = body;
 }
 
+void excom_string_inspect(excom_string_t* string)
+{
+  size_t i;
+  for(i = 0; i < string->size; i++)
+  {
+    printf("%c", string->body[i]);
+  }
+
+  printf("\n");
+}
+
 int excom_string_dup(excom_string_t* string,
   excom_string_t* out)
 {

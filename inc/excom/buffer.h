@@ -28,6 +28,15 @@ int excom_buffer_sappend(excom_buffer_t* buffer,
 
 int excom_buffer_bappend(excom_buffer_t* buffer,
   excom_buffer_t* src);
+int excom_buffer_bappend2(excom_buffer_t* buffer,
+  excom_buffer_t* src, size_t size);
+
+int excom_buffer_bappend_remaining(excom_buffer_t* buffer,
+                                   excom_buffer_t* src);
+
+int excom_buffer_bappend_remaining2(excom_buffer_t* buffer,
+                                    excom_buffer_t* src,
+                                    size_t size);
 
 int excom_buffer_format(excom_buffer_t* out,
   const char* format, ...);

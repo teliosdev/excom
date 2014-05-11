@@ -44,7 +44,7 @@ uassert_empty(string.freeable);
 
       //after
       
-  #line 42
+  #line 47 "test_generator.rb"
       if(test_success) {
   #ifdef VERBOSE
         output("\n\t\t\t" TEXT_COLOR_GREEN "OK\n");
@@ -89,7 +89,7 @@ uassert_empty(string.freeable);
 
       //after
       
-  #line 42
+  #line 47 "test_generator.rb"
       if(test_success) {
   #ifdef VERBOSE
         output("\n\t\t\t" TEXT_COLOR_GREEN "OK\n");
@@ -137,7 +137,7 @@ uassert_empty(string.freeable);
 
       //after
       
-  #line 42
+  #line 47 "test_generator.rb"
       if(test_success) {
   #ifdef VERBOSE
         output("\n\t\t\t" TEXT_COLOR_GREEN "OK\n");
@@ -193,7 +193,7 @@ free(out.body);
 
       //after
       
-  #line 42
+  #line 47 "test_generator.rb"
       if(test_success) {
   #ifdef VERBOSE
         output("\n\t\t\t" TEXT_COLOR_GREEN "OK\n");

@@ -44,6 +44,7 @@ void sighandle(int signal)
 
 int main(int argc, char* argv[])
 {
+  int connection;
   (void) argc;
   (void) argv;
   srv = 0;
@@ -86,7 +87,7 @@ int main(int argc, char* argv[])
     p.type = packet(ping);
     p.id = 0;
     excom_protocol_prefill(&p);
-    excom_protocol_write_packet(&p, &client.buf.out);
+    excom_protocol_write_packet(&p, &client.buf.out, &client.keys);
     printf("[excom-cli/client-test] handling packets\n");
     excom_client_handle_packets(&client, NULL);
     excom_thread_join(&client.thread, NULL);
@@ -96,7 +97,8 @@ int main(int argc, char* argv[])
     printf("[excom-cli/client] init\n");
     excom_client_init(&client);
     printf("[excom-cli/client] connect\n");
-    assert(excom_client_connect(&client) == 0);
+    connection = excom_client_connect(&client);
+    assert(connection == 0);
     printf("[excom-cli/client] handling packets\n");
     excom_client_handle_packets(&client, NULL);
     excom_thread_join(&client.thread, NULL);

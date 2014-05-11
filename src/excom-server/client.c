@@ -4,8 +4,6 @@
 typedef struct client_data
 {
   excom_protocol_state_t state;
-  excom_buffer_t outbuf;
-  excom_buffer_t inbuf;
   excom_encrypt_t keys;
   excom_packet_t* packets;
   excom_packet_t* last;
@@ -13,6 +11,12 @@ typedef struct client_data
   excom_cond_t cond;
   excom_thread_t thread;
   bool disconnected;
+
+  struct {
+    excom_buffer_t  in;
+    excom_buffer_t out;
+    excom_buffer_t enc;
+  } buf;
 } client_data_t;
 
 static void check_packet(excom_server_client_t* client);
@@ -27,33 +31,25 @@ void excom_server_client_connect(excom_event_t event,
   (void) event;
   (void) client;
   excom_string_t str;
-  excom_packet_t version;
 
   printf("[excom] server: Client connected (%d)\n", client->event.fd);
 
   client->data = excom_malloc(sizeof(client_data_t));
 
   client_data->state = EXCOM_PROTOCOL_STATE_PREHANDSHAKE;
-  excom_buffer_init(&client_data->outbuf, 16);
-  excom_buffer_init(&client_data->inbuf, 16);
+  excom_buffer_init(&client_data->buf.in , 16);
+  excom_buffer_init(&client_data->buf.out, 16);
+  excom_buffer_init(&client_data->buf.enc, 16);
   excom_mutex_init(&client_data->mutex);
   excom_cond_init(&client_data->cond);
-  excom_encrypt_init(&client_data->keys, true);
+  excom_encrypt_init(&client_data->keys);
   excom_string_init(&str);
+  client_data->keys.local = &client->server->enc;
   client_data->disconnected = false;
   client_data->packets = NULL;
   client_data->last  = NULL;
 
   excom_thread_init(&client_data->thread, worker, client);
-
-  excom_string_fill(&str, sizeof(EXCOM_VERSION), EXCOM_VERSION);
-  version.type = packet(protocol_version);
-  excom_protocol_prefill(&version, &str, EXCOM_VERSION_MAJOR,
-    EXCOM_VERSION_MINOR, EXCOM_VERSION_PATCH);
-  version.id = 1;
-
-  excom_protocol_write_packet(&version, &client_data->outbuf);
-  excom_buffer_write(&client_data->outbuf, client->event.fd);
 }
 
 void excom_server_client_read(excom_event_t event,
@@ -74,7 +70,7 @@ void excom_server_client_read(excom_event_t event,
 
     if(out > 0)
     {
-      excom_buffer_cappend(&client_data->inbuf, buf, out);
+      excom_buffer_cappend(&client_data->buf.in, buf, out);
     }
     else if(out < 0)
     {
@@ -96,6 +92,7 @@ void excom_server_client_read(excom_event_t event,
   {
     check_packet(client);
   }
+
 }
 
 void excom_server_client_write(excom_event_t event,
@@ -106,7 +103,7 @@ void excom_server_client_write(excom_event_t event,
 
   if(client_data && !client_data->disconnected)
   {
-    excom_buffer_write(&client_data->outbuf, client->event.fd);
+    excom_buffer_write(&client_data->buf.out, client->event.fd);
   }
 }
 
@@ -125,11 +122,11 @@ void excom_server_client_close(excom_event_t event,
   (void) event;
   (void) client;
 
-  if(client_data->disconnected)
+  if(!client_data || client_data->disconnected)
     return;
 
-  excom_buffer_destroy(&client_data->inbuf);
-  excom_buffer_destroy(&client_data->outbuf);
+  excom_buffer_destroy(&client_data->buf.in);
+  excom_buffer_destroy(&client_data->buf.out);
 
   excom_mutex_lock(&client_data->mutex);
 
@@ -168,22 +165,23 @@ static void check_packet(excom_server_client_t* client)
   // represent the size of what is to come.
 
   excom_mutex_lock(&client_data->mutex);
-  while(excom_buffer_remaining(&client_data->inbuf) > 4)
+  while(excom_buffer_remaining(&client_data->buf.in) > 4)
   {
-    excom_mutex_lock(&client_data->inbuf.mutex);
+    excom_mutex_lock(&client_data->buf.in.mutex);
 
-    excom_protocol_unpack_uint32_t((char*) client_data->inbuf.pos, &size);
+    excom_protocol_unpack_uint32_t((char*) client_data->buf.in.pos, &size);
 
     // The entire packet hasn't come through yet, so we need to wait
     // until it does.
-    if(excom_buffer_remaining(&client_data->inbuf) < 4 + size)
+    if(excom_buffer_remaining(&client_data->buf.in) < 4 + size)
     {
       break;
     }
 
     packet = excom_malloc(sizeof(excom_packet_t));
-    err = excom_protocol_read_packet(packet, &client_data->inbuf);
-    excom_mutex_unlock(&client_data->inbuf.mutex);
+    err = excom_protocol_read_packet(packet, &client_data->buf.in,
+                                     &client_data->keys);
+    excom_mutex_unlock(&client_data->buf.in.mutex);
 
     if(err)
     {
@@ -205,9 +203,10 @@ static void check_packet(excom_server_client_t* client)
     }
   }
 
+
+  excom_mutex_unlock(&client_data->buf.in.mutex);
   excom_mutex_unlock(&client_data->mutex);
   excom_cond_signal(&client_data->cond);
-  excom_mutex_unlock(&client_data->inbuf.mutex);
 }
 
 static void* worker(void* cl)
@@ -218,7 +217,11 @@ static void* worker(void* cl)
   while(1)
   {
     excom_mutex_lock(&client_data->mutex);
-    excom_cond_wait(&client_data->cond, &client_data->mutex);
+
+    if(!client_data->packets)
+    {
+      excom_cond_wait(&client_data->cond, &client_data->mutex);
+    }
 
     packet = client_data->packets;
 

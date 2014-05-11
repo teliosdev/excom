@@ -144,6 +144,18 @@ int excom_buffer_sappend(excom_buffer_t* buffer, excom_string_t* str)
 
 int excom_buffer_bappend(excom_buffer_t* buffer, excom_buffer_t* src)
 {
+  return excom_buffer_bappend2(buffer, src, src->used);
+}
+
+int excom_buffer_bappend_remaining(excom_buffer_t* buffer, excom_buffer_t* src)
+{
+  return excom_buffer_bappend_remaining2(buffer, src,
+                                         excom_buffer_remaining(src) - 1);
+}
+
+int excom_buffer_bappend_remaining2(excom_buffer_t* buffer,
+                                    excom_buffer_t* src, size_t s)
+{
   int chk = 0, err = 0;
 
   if(buffer->unmutable)
@@ -151,11 +163,13 @@ int excom_buffer_bappend(excom_buffer_t* buffer, excom_buffer_t* src)
     return EACCES;
   }
 
+  if(s == 0) { return 0; }
+
   excom_mutex_lock(&buffer->mutex);
 
-  if(buffer->used + src->used > buffer->max)
+  if(buffer->used + s > buffer->max)
   {
-    chk = excom_buffer_resize(buffer, buffer->used + src->used);
+    chk = excom_buffer_resize(buffer, buffer->used + s);
   }
 
   if(chk != 0)
@@ -166,8 +180,41 @@ int excom_buffer_bappend(excom_buffer_t* buffer, excom_buffer_t* src)
     return err;
   }
 
-  memcpy(buffer->buf + buffer->used, src->buf, src->used);
-  buffer->used += src->used;
+  memcpy(buffer->buf + buffer->used, src->pos, s);
+  buffer->used += s;
+
+  excom_mutex_unlock(&buffer->mutex);
+
+  return 0;
+}
+
+int excom_buffer_bappend2(excom_buffer_t* buffer, excom_buffer_t* src, size_t amount)
+{
+  int chk = 0, err = 0;
+
+  if(buffer->unmutable)
+  {
+    return EACCES;
+  }
+
+  if(amount == 0) { return 0; }
+
+  excom_mutex_lock(&buffer->mutex);
+
+  if(buffer->used + amount > buffer->max)
+  {
+    chk = excom_buffer_resize(buffer, buffer->used + amount);
+  }
+
+  if(chk != 0)
+  {
+    err = errno;
+    errno = 0;
+    excom_mutex_unlock(&buffer->mutex);
+    return err;
+  }
+  memcpy(buffer->buf + buffer->used, src->buf, amount);
+  buffer->used += amount;
 
   excom_mutex_unlock(&buffer->mutex);
 
@@ -237,13 +284,14 @@ int excom_buffer_format(excom_buffer_t* out,
 
 void excom_buffer_inspect(excom_buffer_t* buffer)
 {
-  size_t i;
+  size_t i,d = 0;
 
-  excom_mutex_lock(&buffer->mutex);
+  //excom_mutex_lock(&buffer->mutex);
   printf("\nbuffer(%zu/%zu): ", buffer->used, buffer->max);
 
-  for(i = 0; i < buffer->used; i++)
+  for(i = 0; i < buffer->used && d < 1000; i++)
   {
+    d += 1;
     if((buffer->buf + i) == buffer->pos)
     {
       printf("\e[0;1;34m|\e[0m %02x", buffer->buf[i]);
@@ -270,7 +318,7 @@ void excom_buffer_inspect(excom_buffer_t* buffer)
     printf("\e[0;1;34m|\e[0m");
   }
 
-  excom_mutex_unlock(&buffer->mutex);
+  //excom_mutex_unlock(&buffer->mutex);
 
   printf("\n");
 }

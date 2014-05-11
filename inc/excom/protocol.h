@@ -42,11 +42,14 @@ typedef enum excom_error_reason
 } excom_error_reason_t;
 
 int excom_protocol_read_packet(excom_packet_t* packet,
-                               excom_buffer_t* in);
+                               excom_buffer_t* in,
+                               excom_encrypt_t* enc);
 int excom_protocol_write_packet(excom_packet_t* packet,
-                                excom_buffer_t* out);
+                                excom_buffer_t* out,
+                                excom_encrypt_t* enc);
 void excom_protocol_prefill(excom_packet_t* packet, ...);
-int excom_protocol_write(excom_packet_t* packet, int sock);
+int excom_protocol_write(excom_packet_t* packet, int sock,
+                         excom_encrypt_t* enc);
 
 int excom_protocol_pack_uint32_t(char* dest, uint32_t n);
 int excom_protocol_unpack_uint32_t(char* src, uint32_t* o);

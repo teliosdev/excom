@@ -12,7 +12,7 @@ MACRO write-test-packet name, fill, &body
   packet.id   = id;
   packet.type = packet(%{name});
   uassert_empty(excom_buffer_init(&buffer, 64));
-  excom_protocol_write_packet(&packet, &buffer);
+  excom_protocol_write_packet(&packet, &buffer, NULL);
   uassert(buffer.used == sizeof(%{fill}) - 1);
   uassert_same((char*) buffer.buf,
     %{fill}, sizeof(%{fill}) - 1);
@@ -26,7 +26,7 @@ MACRO read-test-packet name, str, &body
   excom_buffer_init(&buf, 16);
   excom_buffer_cappend(&buf, %{str}, sizeof(%{str}));
   uassert_empty(
-    excom_protocol_read_packet(&packet, &buf)
+    excom_protocol_read_packet(&packet, &buf, NULL)
   );
   id++;
   uassert_equal(packet.type, packet(%{name}));

@@ -62,6 +62,7 @@ typedef struct excom_server
 
   struct excom_event_base base;
 
+  excom_encrypt_pair_t enc;
   struct excom_server_client* clients;
 } excom_server_t;
 

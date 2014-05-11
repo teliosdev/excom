@@ -1,8 +1,8 @@
 CFLAGS  += -std=c99 -fno-builtin -g3 -Wall -Wextra -fPIC -I$(CURDIR)/inc $(CFLAG)
-LDFLAGS += -L$(CURDIR) -pthread -lexcom -ltoml -lsodium
+LDFLAGS += -L$(CURDIR) -pthread -lexcom -ltoml -lsodium -lm
 RM ?= rm -f
 CURDIR ?= `pwd`
-SODIUM_VERSION = 0.5.0
+SODIUM_VERSION = 0.4.5
 
 OBJS := src/excom/server.o src/excom/string.o src/excom/thread.o  \
 	src/excom/factory.o src/excom/event.o src/excom/server/client.o \
@@ -26,27 +26,23 @@ libexcom.a: $(OBJS)
 	$(AR) r $@ $?
 
 libsodium.a: libsodium-$(SODIUM_VERSION)
-	cd libsodium-$(SODIUM_VERSION) && autoreconf -i && ./configure --prefix=$(CURDIR)/lib/sodium
+	cd libsodium-$(SODIUM_VERSION) && ./configure --prefix=$(CURDIR)/lib/sodium
 	make -C libsodium-$(SODIUM_VERSION)
 	cp -R libsodium-$(SODIUM_VERSION)/src/libsodium/include/sodium* inc
 	cp libsodium-$(SODIUM_VERSION)/src/libsodium/.libs/libsodium.a .
 
-libsodium-$(SODIUM_VERSION):
-	git clone https://github.com/jedisct1/libsodium.git
-	mv libsodium libsodium-$(SODIUM_VERSION)
+libsodium-$(SODIUM_VERSION): libsodium-$(SODIUM_VERSION).tar.gz
+	tar xvf $<
 
-#libsodium-$(SODIUM_VERSION): libsodium-$(SODIUM_VERSION).tar.gz
-#	tar xvf $<
-
-#libsodium-$(SODIUM_VERSION).tar.gz:
-#	wget "https://download.libsodium.org/libsodium/releases/libsodium-$(SODIUM_VERSION).tar.gz"
+libsodium-$(SODIUM_VERSION).tar.gz:
+	wget "https://download.libsodium.org/libsodium/releases/libsodium-$(SODIUM_VERSION).tar.gz"
 
 libtoml.so:
 	cd $(CURDIR)/lib/toml && autoconf && ./configure CFLAGS=-fPIC && make
 	cp lib/toml/libtoml.so libtoml.so
 
 excom.out: libsodium.a libexcom.a libtoml.so $(BINOJBS)
-	$(CC) -o $@ $(CFLAGS) $(LDFLAGS) $(BINOJBS) -lexcom -ltoml -lsodium
+	$(CC) -o $@ $(CFLAGS) $(BINOJBS) $(LDFLAGS)
 
 test: libexcom.a $(TESTOBJS)
 	@./test/run_tests ./test
@@ -55,7 +51,7 @@ clean:
 	$(RM) -r $(OBJS) $(TESTOBJS) libexcom.a excom
 
 clean-sodium:
-	$(RM) -r libsodium-$(SODIUM_VERSION) libsodium-$(SODIUM_VERSION).tar.gz libsodium.a
+	$(RM) -r libsodium-$(SODIUM_VERSION) libsodium-$(SODIUM_VERSION).tar.gz libsodium.a inc/sodium{,.h}
 
 inc/excom.h: inc/excom/protocol/packets.def
 
@@ -71,3 +67,6 @@ test/%.out: test/%.test inc/*.h inc/*/*.h inc/*/*/*.h test/utest.h Makefile
 
 get-deps:
 	sudo apt-get install valgrind
+
+src/excom/excom-client/client.c: src/excom/excom-client/handle_packets.ci
+src/excom/excom-server/client.c: src/excom/excom-server/handle_packets.ci

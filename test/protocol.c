@@ -68,7 +68,7 @@ packet.type = packet(ok);
 uassert_empty(excom_buffer_init(&buffer, 64));
 
 #line 15 "protocol.test"
-excom_protocol_write_packet(&packet, &buffer);
+excom_protocol_write_packet(&packet, &buffer, NULL);
 
 #line 16 "protocol.test"
 uassert(buffer.used == sizeof("\0\0\0\0\0\x01\0\x01") - 1);
@@ -85,7 +85,7 @@ excom_buffer_destroy(&buffer);
 
       //after
       
-  #line 42
+  #line 47 "test_generator.rb"
       if(test_success) {
   #ifdef VERBOSE
         output("\n\t\t\t" TEXT_COLOR_GREEN "OK\n");
@@ -146,7 +146,7 @@ packet.type = packet(reject);
 uassert_empty(excom_buffer_init(&buffer, 64));
 
 #line 15 "protocol.test"
-excom_protocol_write_packet(&packet, &buffer);
+excom_protocol_write_packet(&packet, &buffer, NULL);
 
 #line 16 "protocol.test"
 uassert(buffer.used == sizeof("\0\0\0\x01\0\x02\0\x02\x40") - 1);
@@ -163,7 +163,7 @@ excom_buffer_destroy(&buffer);
 
       //after
       
-  #line 42
+  #line 47 "test_generator.rb"
       if(test_success) {
   #ifdef VERBOSE
         output("\n\t\t\t" TEXT_COLOR_GREEN "OK\n");
@@ -224,7 +224,7 @@ packet.type = packet(error);
 uassert_empty(excom_buffer_init(&buffer, 64));
 
 #line 15 "protocol.test"
-excom_protocol_write_packet(&packet, &buffer);
+excom_protocol_write_packet(&packet, &buffer, NULL);
 
 #line 16 "protocol.test"
 uassert(buffer.used == sizeof("\0\0\0\x01\0\x03\0\x03\x38") - 1);
@@ -241,7 +241,7 @@ excom_buffer_destroy(&buffer);
 
       //after
       
-  #line 42
+  #line 47 "test_generator.rb"
       if(test_success) {
   #ifdef VERBOSE
         output("\n\t\t\t" TEXT_COLOR_GREEN "OK\n");
@@ -306,7 +306,7 @@ packet.type = packet(protocol_version);
 uassert_empty(excom_buffer_init(&buffer, 64));
 
 #line 15 "protocol.test"
-excom_protocol_write_packet(&packet, &buffer);
+excom_protocol_write_packet(&packet, &buffer, NULL);
 
 #line 16 "protocol.test"
 uassert(buffer.used == sizeof("\0\0\0\x0c\0\x04\0\x04\0\0\0\0051.0.0\x01\0\0") - 1);
@@ -323,7 +323,7 @@ excom_buffer_destroy(&buffer);
 
       //after
       
-  #line 42
+  #line 47 "test_generator.rb"
       if(test_success) {
   #ifdef VERBOSE
         output("\n\t\t\t" TEXT_COLOR_GREEN "OK\n");
@@ -385,7 +385,7 @@ packet.type = packet(command);
 uassert_empty(excom_buffer_init(&buffer, 64));
 
 #line 15 "protocol.test"
-excom_protocol_write_packet(&packet, &buffer);
+excom_protocol_write_packet(&packet, &buffer, NULL);
 
 #line 16 "protocol.test"
 uassert(buffer.used == sizeof("\0\0\0\x08\0\x05\0\x05\0\0\0\004test") - 1);
@@ -402,7 +402,7 @@ excom_buffer_destroy(&buffer);
 
       //after
       
-  #line 42
+  #line 47 "test_generator.rb"
       if(test_success) {
   #ifdef VERBOSE
         output("\n\t\t\t" TEXT_COLOR_GREEN "OK\n");
@@ -473,7 +473,7 @@ excom_buffer_cappend(&buf, "\0\0\0\0\0\x06\0\x01", sizeof("\0\0\0\0\0\x06\0\x01"
 uassert_empty(
 
 #line 29 "protocol.test"
-  excom_protocol_read_packet(&packet, &buf)
+  excom_protocol_read_packet(&packet, &buf, NULL)
 
 #line 30 "protocol.test"
 );
@@ -511,7 +511,7 @@ excom_buffer_destroy(&buf);
 
       //after
       
-  #line 42
+  #line 47 "test_generator.rb"
       if(test_success) {
   #ifdef VERBOSE
         output("\n\t\t\t" TEXT_COLOR_GREEN "OK\n");
@@ -555,7 +555,7 @@ excom_buffer_cappend(&buf, "\0\0\0\x01\0\x07\0\x02\x40", sizeof("\0\0\0\x01\0\x0
 uassert_empty(
 
 #line 29 "protocol.test"
-  excom_protocol_read_packet(&packet, &buf)
+  excom_protocol_read_packet(&packet, &buf, NULL)
 
 #line 30 "protocol.test"
 );
@@ -595,7 +595,7 @@ excom_buffer_destroy(&buf);
 
       //after
       
-  #line 42
+  #line 47 "test_generator.rb"
       if(test_success) {
   #ifdef VERBOSE
         output("\n\t\t\t" TEXT_COLOR_GREEN "OK\n");
@@ -670,7 +670,7 @@ uassert_equal(pv.patch, 0);
 
       //after
       
-  #line 42
+  #line 47 "test_generator.rb"
       if(test_success) {
   #ifdef VERBOSE
         output("\n\t\t\t" TEXT_COLOR_GREEN "OK\n");

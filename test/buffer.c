@@ -52,7 +52,7 @@ uassert_equal(buffer.buf, buffer.pos);
 excom_buffer_destroy(&buffer);
 
 
-  #line 42
+  #line 47 "test_generator.rb"
       if(test_success) {
   #ifdef VERBOSE
         output("\n\t\t\t" TEXT_COLOR_GREEN "OK\n");
@@ -102,7 +102,7 @@ uassert_same(buffer.buf, "only\xdd", 5);
 excom_buffer_destroy(&buffer);
 
 
-  #line 42
+  #line 47 "test_generator.rb"
       if(test_success) {
   #ifdef VERBOSE
         output("\n\t\t\t" TEXT_COLOR_GREEN "OK\n");
@@ -157,7 +157,7 @@ buffer.used = 0;
 excom_buffer_destroy(&buffer);
 
 
-  #line 42
+  #line 47 "test_generator.rb"
       if(test_success) {
   #ifdef VERBOSE
         output("\n\t\t\t" TEXT_COLOR_GREEN "OK\n");
@@ -228,7 +228,7 @@ buffer.used = 0;
 excom_buffer_destroy(&buffer);
 
 
-  #line 42
+  #line 47 "test_generator.rb"
       if(test_success) {
   #ifdef VERBOSE
         output("\n\t\t\t" TEXT_COLOR_GREEN "OK\n");
@@ -278,7 +278,7 @@ buffer.used = 0;
 excom_buffer_destroy(&buffer);
 
 
-  #line 42
+  #line 47 "test_generator.rb"
       if(test_success) {
   #ifdef VERBOSE
         output("\n\t\t\t" TEXT_COLOR_GREEN "OK\n");
@@ -335,7 +335,7 @@ buffer.used = 0;
 excom_buffer_destroy(&buffer);
 
 
-  #line 42
+  #line 47 "test_generator.rb"
       if(test_success) {
   #ifdef VERBOSE
         output("\n\t\t\t" TEXT_COLOR_GREEN "OK\n");
@@ -401,7 +401,7 @@ uassert_same(buff, "hello world", 11);
 excom_buffer_destroy(&buffer);
 
 
-  #line 42
+  #line 47 "test_generator.rb"
       if(test_success) {
   #ifdef VERBOSE
         output("\n\t\t\t" TEXT_COLOR_GREEN "OK\n");

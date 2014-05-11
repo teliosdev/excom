@@ -9,6 +9,8 @@
   b;                                  \
 }
 
+int excom_mutex_islocked(excom_mutex_t*);
+
 #define send(t, ...) do               \
 {                                     \
   excom_packet_t _temp;               \
@@ -17,49 +19,82 @@
   excom_protocol_prefill(&_temp,      \
     ##__VA_ARGS__);                   \
   excom_protocol_write_packet(&_temp, \
-    &data->buf.out);                  \
+    &data->buf.out, &data->keys);     \
   printf("writing packet %s\n", #t);  \
 } while(0)
 
 #define error(reason) send(error, EXCOM_ERROR_##reason)
 #define reject(reason) send(reject, EXCOM_REJECT_##reason)
 
-#define require(level) if(data->state != EXCOM_PROTOCOL_STATE_##level) \
-  error(NOT_AVAILABLE_ERROR); return;
+#define require(level) if(data->state != \
+  EXCOM_PROTOCOL_STATE_##level) {        \
+  error(NOT_AVAILABLE_ERROR);            \
+  return;                                \
+}
 
 handle(ok, {
+  excom_string_t pkey;
+  printf("recieved ok packet\n");
 
-})
+  if(data->state == EXCOM_PROTOCOL_STATE_PREHANDSHAKE)
+  {
+    data->state = EXCOM_PROTOCOL_STATE_PREENCRYPT;
+    excom_string_init(&pkey);
+    excom_string_fill(&pkey, crypto_box_PUBLICKEYBYTES,
+                      (char*) data->enc.pkey);
+    send(public_key, &pkey);
+  }
+});
 
 handle(reject, {
 
-})
+});
 
 handle(error, {
 
-})
+});
 
 handle(public_key, {
+  require(PREENCRYPT);
 
-})
+  if(packet.key.size != crypto_box_PUBLICKEYBYTES)
+  {
+    error(PUBLIC_KEY_ERROR);
+  }
+  else
+  {
+    memcpy(packet.key.body, data->keys.remote.pkey,
+           crypto_box_PUBLICKEYBYTES);
+    data->keys.remote.active = true;
+    data->state = EXCOM_PROTOCOL_STATE_ENCRYPT;
+    send(ping);
+  }
+});
 
-int excom_mutex_islocked(excom_mutex_t*);
 handle(protocol_version, {
-  int t;
-  printf("HI!\n");
-  t = excom_mutex_islocked(&data->buf.out.mutex);
-  printf("Is locked: %i\n", t);
   error(INVALID_ERROR);
-})
+});
+
+handle(pong, {
+  excom_string_t cmd;
+
+  if(data->state == EXCOM_PROTOCOL_STATE_ENCRYPT)
+  {
+    data->state = EXCOM_PROTOCOL_STATE_BODY;
+    excom_string_init(&cmd);
+    excom_string_fill(&cmd, strlen("hello world"), "hello world");
+    send(command, &cmd);
+  }
+});
 
 handle(ping, {
 
-})
+});
 
 handle(command, {
 
-})
+});
 
 handle(command_response, {
 
-})
+});

@@ -53,9 +53,14 @@ void excom_client_init(excom_client_t* client)
   client->port    = EXCOM_DEFAULT_PORT;
   client->addr    = "127.0.0.1";
   client->packets = NULL;
+  client->state   = EXCOM_PROTOCOL_STATE_PREHANDSHAKE;
   client->disconnected = false;
 
+  excom_encrypt_init(&client->keys);
+  excom_encrypt_pair_fill(&client->enc);
   excom_mutex_init(&client->mutex);
+
+  client->keys.local = &client->enc;
 }
 
 int excom_client_connect(excom_client_t* client)
@@ -100,7 +105,9 @@ int excom_client_connect(excom_client_t* client)
     EXCOM_VERSION_MINOR, EXCOM_VERSION_PATCH);
   version.id = 1;
 
-  excom_protocol_write_packet(&version, &client->buf.out);
+  printf("writing...\n");
+  excom_protocol_write_packet(&version, &client->buf.out, &client->keys);
+  excom_buffer_write(&client->buf.out, client->sock);
 
   return err;
 }

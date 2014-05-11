@@ -98,7 +98,8 @@ static void check_packet(excom_client_t* client)
   }
 
   packet = excom_malloc(sizeof(excom_packet_t));
-  err = excom_protocol_read_packet(packet, &client->buf.in);
+  err = excom_protocol_read_packet(packet, &client->buf.in,
+                                   &client->keys);
   excom_mutex_unlock(&client->buf.in.mutex);
 
   if(err)
