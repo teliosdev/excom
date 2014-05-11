@@ -65,7 +65,7 @@ test/%.out: test/%.test inc/*.h inc/*/*.h inc/*/*/*.h test/utest.h Makefile
 	ruby scripts/test_generator.rb
 	$(CC) -o $@ $(CFLAGS) -x c $(patsubst %.out,%.c,$@) $(LDFLAGS)
 
-get-deps:
+get-deps: libsodium.a
 	sudo apt-get install valgrind
 
 src/excom/excom-client/client.c: src/excom/excom-client/handle_packets.ci
