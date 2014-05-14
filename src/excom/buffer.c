@@ -7,7 +7,7 @@ int excom_buffer_init(excom_buffer_t* buffer, size_t start)
   buffer->_init = buffer->max = start;
   buffer->used = 0;
   buffer->unmutable = false;
-  buffer->freeable = false;
+  buffer->freeable = true;
 
   buffer->pos = buffer->buf = excom_malloc(start * sizeof(char));
 
@@ -33,7 +33,8 @@ int excom_buffer_reset(excom_buffer_t* buffer)
 
   buffer->max = buffer->_init;
   buffer->used = 0;
-  buffer->freeable = buffer->unmutable = false;
+  buffer->unmutable = false;
+  buffer->freeable = true;
 
   buffer->pos = buffer->buf = excom_malloc(buffer->max *
     sizeof(char));
@@ -150,7 +151,7 @@ int excom_buffer_bappend(excom_buffer_t* buffer, excom_buffer_t* src)
 int excom_buffer_bappend_remaining(excom_buffer_t* buffer, excom_buffer_t* src)
 {
   return excom_buffer_bappend_remaining2(buffer, src,
-                                         excom_buffer_remaining(src) - 1);
+                                         (src->buf + src->used) - src->pos);
 }
 
 int excom_buffer_bappend_remaining2(excom_buffer_t* buffer,
@@ -282,11 +283,20 @@ int excom_buffer_format(excom_buffer_t* out,
   return 0;
 }
 
+/*
+ * This SHOULD NOT be called outside of debug.  That's why
+ * it a) doesn't lock the mutex and b) isn't in the header
+ * file.
+ */
 void excom_buffer_inspect(excom_buffer_t* buffer)
 {
   size_t i,d = 0;
 
-  //excom_mutex_lock(&buffer->mutex);
+#ifdef NDEBUG
+  fprintf(stderr, "[excom] ERROR - excom_buffer_inspect called, ignoring.\n");
+  return;
+#endif
+
   printf("\nbuffer(%zu/%zu): ", buffer->used, buffer->max);
 
   for(i = 0; i < buffer->used && d < 1000; i++)
@@ -318,17 +328,18 @@ void excom_buffer_inspect(excom_buffer_t* buffer)
     printf("\e[0;1;34m|\e[0m");
   }
 
-  //excom_mutex_unlock(&buffer->mutex);
-
   printf("\n");
 }
 
 void excom_buffer_destroy(excom_buffer_t* buffer)
 {
-  free(buffer->buf);
+  if(buffer->freeable)
+  {
+    excom_free(buffer->buf);
+  }
   buffer->max  = 0;
   buffer->used = 0;
-  buffer->buf  = NULL;
+  buffer->buf  = buffer->pos = NULL;
 }
 
 int excom_buffer_write(excom_buffer_t* buffer,

@@ -225,21 +225,21 @@ int excom_tls_key_init(excom_tls_key_t* key)
 #endif
 }
 
-void* excom_tls_get(excom_tls_key_t key)
+void* excom_tls_get(excom_tls_key_t* key)
 {
 #ifdef EXCOM_POSIX
-  return pthread_getspecific(key);
+  return pthread_getspecific(*key);
 #else
-  return TlsGetValue(key);
+  return TlsGetValue(*key);
 #endif
 }
 
-int excom_tls_set(excom_tls_key_t key, void* value)
+int excom_tls_set(excom_tls_key_t* key, void* value)
 {
 #ifdef EXCOM_POSIX
-  return pthread_setspecific(key, value);
+  return pthread_setspecific(*key, value);
 #else
-  if(TlsSetValue(key, value) == FALSE)
+  if(TlsSetValue(*key, value) == FALSE)
   {
     return GetLastError();
   }

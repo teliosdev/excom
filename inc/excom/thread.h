@@ -64,10 +64,25 @@ typedef struct excom_thread_data
   struct excom_thread* thread;
 } excom_thread_data_t;
 
+/*!
+ * The current running status of the thread.
+ */
 typedef enum excom_thread_status
 {
+  /*!
+   * This should never be the status of the thread.  There is
+   * an issue if this is the status.
+   */
   EXCOM_THREAD_STATUS_INVALID = 0u,
+
+  /*!
+   * The thread in question is running.
+   */
   EXCOM_THREAD_STATUS_RUNNING,
+
+  /*!
+   * The thread in question is not running.
+   */
   EXCOM_THREAD_STATUS_STOPPED
 } excom_thread_status_t;
 
@@ -106,6 +121,9 @@ typedef struct excom_thread
    */
   void* ret;
 
+  /*!
+   * The thread's current status.
+   */
   excom_thread_status_t status;
 } excom_thread_t;
 
@@ -294,7 +312,7 @@ int excom_tls_key_init(excom_tls_key_t* key);
  * @returns The value in the key-value pair, or NULL (if nothing was
  *   set).
  */
-void* excom_tls_get(excom_tls_key_t key);
+void* excom_tls_get(excom_tls_key_t* key);
 
 /*!
  * Sets the value that is associated with the TLS key in this thread.
@@ -304,6 +322,6 @@ void* excom_tls_get(excom_tls_key_t key);
  * @param [in] value The value to set in the key-value pair.
  * @returns An error code, or `0` if there was none.
  */
-int excom_tls_set(excom_tls_key_t key, void* value);
+int excom_tls_set(excom_tls_key_t* key, void* value);
 
 #endif

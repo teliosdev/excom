@@ -17,42 +17,32 @@ be that difficult.  Excom requires the c99 standard, excluding
 use them:
 
 <table>
-  <thead>
-    <tr>
-      <th>
-        Define
-      </th>
-      <th>
-        Possible Values
-      </th>
-      <th>
-        Meaning
-      </th>
-    </tr>
-  </thead>
+  <tr>
+    <th>Define</th>
+    <th>Possible Values</th>
+    <th>Meaning</th>
+  </tr>
 
-  <tbody>
-    <tr>
-      <td><code>EXCOM_NO_STDBOOL</code></td>
-      <td><i>none</i></td>
-      <td>If this is defined, excom will use its own stdbool implementation.</td>
-    </tr>
-    <tr>
-      <td><code>EXCOM_INCLUDE_SERVER_CLIENT</code></td>
-      <td><i>none</i></td>
-      <td>If this is defined, excom will include a very basic implementation of a server that can handle reading and writing to clients.  It will not be able to handle anything more than that, though.</td>
-    </tr>
-    <tr>
-      <td><code>EXCOM_EPOLL</code></td>
-      <td><i>none</i></td>
-      <td>If this is defined, excom will try to use epoll.  epoll <b>must</b> have support for <code>epoll_create1()</code>.</td>
-    </tr>
-    <tr>
-      <td><code>EXCOM_KQUEUE</code></td>
-      <td><i>none</i></td>
-      <td>If this is defined, excom will try to use kqueue.  If it does not exist on the system, the compiler will error with <q>fatal error: sys/event.h: No such file or directory.</q> <i>Note: the support for kqueue in excom is still a little shakey, since I cannot test it in my current environment.</i></td>
-    </tr>
-  </tbody>
+  <tr>
+    <td><code>EXCOM_NO_STDBOOL</code></td>
+    <td><i>none</i></td>
+    <td>If this is defined, excom will use its own stdbool implementation.</td>
+  </tr>
+  <tr>
+    <td><code>EXCOM_INCLUDE_SERVER_CLIENT</code></td>
+    <td><i>none</i></td>
+    <td>If this is defined, excom will include a very basic implementation of a server that can handle reading and writing to clients.  It will not be able to handle anything more than that, though.</td>
+  </tr>
+  <tr>
+    <td><code>EXCOM_EPOLL</code></td>
+    <td><i>none</i></td>
+    <td>If this is defined, excom will try to use epoll.  epoll <b>must</b> have support for <code>epoll_create1()</code>.</td>
+  </tr>
+  <tr>
+    <td><code>EXCOM_KQUEUE</code></td>
+    <td><i>none</i></td>
+    <td>If this is defined, excom will try to use kqueue.  If it does not exist on the system, the compiler will error with <code>fatal error: sys/event.h: No such file or directory.</code> <i>Note: the support for kqueue in excom is still a little shakey, since I cannot test it in my current environment.</i></td>
+  </tr>
 </table>
 
 After you've defined what you need to, the main body of the code
