@@ -1,5 +1,5 @@
 #ifndef _EXCOM_EVENT_KQEUE_H
-#define _EXCOM_EVENT_QUEUE_H
+#define _EXCOM_EVENT_KQEUE_H
 
 #include <sys/types.h>
 #include <sys/event.h>

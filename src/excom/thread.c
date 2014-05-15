@@ -9,11 +9,11 @@ DWORD WINAPI excom_thread_wrapper(void* arg)
 #endif
 {
   excom_thread_data_t* data = (excom_thread_data_t*) arg;
-  excom_tls_set(local_data, data);
+  excom_tls_set(&local_data, data);
 
   data->thread->ret = (*data->proc)(data->arg);
 
-  excom_tls_set(local_data, NULL);
+  excom_tls_set(&local_data, NULL);
   excom_free(data);
 
 #ifdef EXCOM_POSIX
@@ -67,7 +67,7 @@ int excom_thread_init(
 
 void excom_thread_exit(void* retval)
 {
-  excom_thread_data_t* d = excom_tls_get(local_data);
+  excom_thread_data_t* d = excom_tls_get(&local_data);
 
   if(d != NULL)
   {
@@ -108,7 +108,7 @@ int excom_thread_join(excom_thread_t* thread, void** result)
 
 excom_thread_t* excom_thread_current()
 {
-  return (excom_thread_t*) excom_tls_get(local_data);
+  return (excom_thread_t*) excom_tls_get(&local_data);
 }
 
 int excom_mutex_init(excom_mutex_t* mutex)
