@@ -35,7 +35,7 @@ libsodium-$(SODIUM_VERSION): libsodium-$(SODIUM_VERSION).tar.gz
 	tar xvf $<
 
 libsodium-$(SODIUM_VERSION).tar.gz:
-	wget "https://download.libsodium.org/libsodium/releases/libsodium-$(SODIUM_VERSION).tar.gz"
+	curl "https://download.libsodium.org/libsodium/releases/libsodium-$(SODIUM_VERSION).tar.gz" -o libsodium-$(SODIUM_VERSION).tar.gz
 
 libtoml.so:
 	cd $(CURDIR)/lib/toml && autoconf && ./configure CFLAGS=-fPIC && make
