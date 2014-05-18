@@ -10,7 +10,7 @@ run.  It generates a header file that is used by the project.
 The project uses [libtoml](https://github.com/ajwans/libtoml), which
 is under the 3 clause BSD license.
 
-This project uses make.  Sorry, I'm comfortable with `make`, and I
+This project uses `make`.  Sorry, I'm comfortable with `make`, and I
 know how to use it.  However, building excom without make shouldn't
 be that difficult.  Excom requires the c99 standard, excluding
 `stdbool.h` (it will use it if it can).  Some defines and how you can
@@ -36,7 +36,7 @@ use them:
   <tr>
     <td><code>EXCOM_EPOLL</code></td>
     <td><i>none</i></td>
-    <td>If this is defined, excom will try to use epoll.  epoll <b>must</b> have support for <code>epoll_create1()</code>.</td>
+    <td>If this is defined, excom will try to use epoll.</td>
   </tr>
   <tr>
     <td><code>EXCOM_KQUEUE</code></td>

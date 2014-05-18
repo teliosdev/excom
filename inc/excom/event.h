@@ -89,6 +89,8 @@ typedef struct excom_event
  */
 typedef void (excom_event_runner_t)(excom_event_t, void*);
 
+#include "excom/event/undef.h"
+
 #if defined(DOXYGEN)
 #elif defined(EXCOM_EPOLL)
 #  define EXCOM_USE_EPOLL

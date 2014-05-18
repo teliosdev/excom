@@ -1,11 +1,11 @@
 #include "excom.h"
-
-#ifdef EXCOM_USE_POLL
+#include "excom/event/undef.h"
+#include "excom/event/poll.h"
 
 #define POLL_SIZE sizeof(struct pollfd)
 #define EVENT_SIZE sizeof(struct excom_event*)
 
-int excom_event_base_poll_init(excom_event_base_t* base,
+int excom_event_base_poll_init(excom_event_base_poll_t* base,
   excom_event_runner_t* runner)
 {
   int err;
@@ -22,7 +22,7 @@ int excom_event_base_poll_init(excom_event_base_t* base,
   return base->fds == NULL;
 }
 
-int excom_event_base_poll_destroy(excom_event_base_t* base)
+int excom_event_base_poll_destroy(excom_event_base_poll_t* base)
 {
   base->loop = false;
   excom_free(base->fds);
@@ -32,7 +32,7 @@ int excom_event_base_poll_destroy(excom_event_base_t* base)
   return 0;
 }
 
-int excom_event_poll_update(excom_event_base_t* base,
+int excom_event_poll_update(excom_event_base_poll_t* base,
   excom_event_t* event)
 {
   uintptr_t index;
@@ -43,10 +43,11 @@ int excom_event_poll_update(excom_event_base_t* base,
     return EINVAL;
   }
 
-  base->fds[index].events = event->events;
+  base->fds[index].events = event->flags;
+  return 0;
 }
 
-int excom_event_poll_add(excom_event_base_t* base,
+int excom_event_poll_add(excom_event_base_poll_t* base,
   excom_event_t* event)
 {
   struct pollfd* ev;
@@ -78,7 +79,7 @@ int excom_event_poll_add(excom_event_base_t* base,
   return 0;
 }
 
-int excom_event_poll_remove(excom_event_base_t* base,
+int excom_event_poll_remove(excom_event_base_poll_t* base,
   excom_event_t* event)
 {
   uintptr_t index;
@@ -116,7 +117,7 @@ int excom_event_poll_remove(excom_event_base_t* base,
   return 0;
 }
 
-void excom_event_poll_loop(excom_event_base_t* base, void* ptr)
+void excom_event_poll_loop(excom_event_base_poll_t* base, void* ptr)
 {
   excom_event_t event, *eptr;
   int n, e;
@@ -150,9 +151,7 @@ void excom_event_poll_loop(excom_event_base_t* base, void* ptr)
   }
 }
 
-void excom_event_poll_loop_end(excom_event_base_t* base)
+void excom_event_poll_loop_end(excom_event_base_poll_t* base)
 {
   base->loop = false;
 }
-
-#endif

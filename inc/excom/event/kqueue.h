@@ -47,6 +47,7 @@ void excom_event_kqueue_loop_end(excom_event_base_t* base);
 
 #define excom_event_base_init excom_event_base_kqueue_init
 #define excom_event_add excom_event_kqueue_add
+#define excom_event_update excom_event_kqueue_update
 #define excom_event_remove excom_event_kqueue_remove
 #define excom_event_loop excom_event_kqueue_loop
 #define excom_event_loop_end excom_event_kqueue_loop

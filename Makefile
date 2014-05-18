@@ -17,6 +17,7 @@ BINOJBS := src/excom-server/client.c src/excom-client/client.c    \
 CFLAGS  += -I$(CURDIR)/lib/toml
 
 .PHONY: default clean test get-deps cdt
+.SUFFIXES: .o .c .out
 
 default: excom.out
 
@@ -61,9 +62,16 @@ inc/excom/protocol/packets.def: scripts/packets.rb scripts/packet_generator.rb
 %.o: %.c inc/*.h inc/*/*.h inc/*/*/*.h Makefile
 	$(CC) -o $@ $(CFLAGS) -c $< $(LDFLAGS)
 
+.c.o:
+	$(CC) -o $@ $(CFLAGS) -c $< $(LDFLAGS)
+
 test/%.out: test/%.test inc/*.h inc/*/*.h inc/*/*/*.h test/utest.h Makefile
 	ruby scripts/test_generator.rb
 	$(CC) -o $@ $(CFLAGS) -x c $(patsubst %.out,%.c,$@) $(LDFLAGS)
+
+.c.out:
+	ruby scripts/test_generator.rb
+	$(CC) -o $@ $(CFLAGS) -x c $< $(LDFLAGS)
 
 get-deps: libsodium.a
 	sudo apt-get install valgrind

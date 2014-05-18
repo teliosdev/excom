@@ -1,7 +1,7 @@
 #include "excom.h"
 #ifdef EXCOM_KQUEUE
 
-int excom_event_base_kqueue_init(struct excom_event_base* base,
+int excom_event_base_kqueue_init(excom_event_base_kqueue_t* base,
   excom_event_runner_t* runner)
 {
   int err = 0;
@@ -20,13 +20,13 @@ int excom_event_base_kqueue_init(struct excom_event_base* base,
   return err;
 }
 
-int excom_event_kqueue_update(struct excom_event_base* base,
+int excom_event_kqueue_update(excom_event_base_kqueue_t* base,
   excom_event_t* event)
 {
   return excom_event_kqueue_add(base, event);
 }
 
-int excom_event_kqueue_add(struct excom_event_base* base,
+int excom_event_kqueue_add(excom_event_base_kqueue_t* base,
   excom_event_t* event)
 {
   int ret;
@@ -73,7 +73,7 @@ int excom_event_kqueue_remove(excom_event_base_t* base,
   return 0;
 }
 
-void excom_event_kqueue_loop(struct excom_event_base* base, void* ptr)
+void excom_event_kqueue_loop(excom_event_base_kqueue_t* base, void* ptr)
 {
   //excom_kevent_t* events;
   excom_event_t event, *eptr;
@@ -136,7 +136,7 @@ void excom_event_kqueue_loop(struct excom_event_base* base, void* ptr)
 #undef curev
 }
 
-void excom_event_kqueue_loop_end(struct excom_event_base* base)
+void excom_event_kqueue_loop_end(excom_event_base_kqueue_t* base)
 {
   base->loop = false;
 }

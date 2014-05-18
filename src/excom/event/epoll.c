@@ -1,7 +1,7 @@
 #include "excom.h"
 #ifdef EXCOM_EPOLL
 
-int excom_event_base_epoll_init(excom_event_base_t* base,
+int excom_event_base_epoll_init(excom_event_base_epoll_t* base,
   excom_event_runner_t* runner)
 {
   base->loop      = true;
@@ -18,7 +18,7 @@ int excom_event_base_epoll_init(excom_event_base_t* base,
   return 0;
 }
 
-int excom_event_epoll_update(excom_event_base_t* base,
+int excom_event_epoll_update(excom_event_base_epoll_t* base,
   excom_event_t* event)
 {
   int err;
@@ -37,7 +37,7 @@ int excom_event_epoll_update(excom_event_base_t* base,
   return 0;
 }
 
-int excom_event_epoll_add(excom_event_base_t* base,
+int excom_event_epoll_add(excom_event_base_epoll_t* base,
   excom_event_t* event)
 {
   int err;
@@ -57,7 +57,7 @@ int excom_event_epoll_add(excom_event_base_t* base,
   return 0;
 }
 
-int excom_event_epoll_remove(excom_event_base_t* base,
+int excom_event_epoll_remove(excom_event_base_epoll_t* base,
   excom_event_t* event)
 {
   int err;
@@ -74,7 +74,7 @@ int excom_event_epoll_remove(excom_event_base_t* base,
   return 0;
 }
 
-void excom_event_epoll_loop(excom_event_base_t* base, void* ptr)
+void excom_event_epoll_loop(excom_event_base_epoll_t* base, void* ptr)
 {
   //struct epoll_event* events;
   excom_event_t event, *eptr;
@@ -104,7 +104,7 @@ void excom_event_epoll_loop(excom_event_base_t* base, void* ptr)
   }
 }
 
-void excom_event_epoll_loop_end(excom_event_base_t* base)
+void excom_event_epoll_loop_end(excom_event_base_epoll_t* base)
 {
   base->loop = false;
 }
