@@ -56,6 +56,33 @@ sub compile {
   return $? << 8 == 0;
 }
 
+sub check_command {
+  my $command = shift;
+
+  print "$command\n" if $verbose;
+  my $output = `$command`;
+  print "$output\n" if $verbose;
+  return $? << 8 == 0;
+}
+
+sub command {
+  my $command = shift;
+  my $arguments = shift || "";
+  my $fail = shift || 1;
+
+  print "Checking for $command... ";
+
+  if (!check_command("$command $arguments")) {
+    print "no\n";
+    if($fail)
+    {
+      exit 1;
+    }
+  } else {
+    printf "yes\n";
+  }
+}
+
 sub define_header {
   my $header_name = shift;
 
@@ -70,7 +97,7 @@ sub check_header {
   my $header = shift;
   my $flags = shift;
   my $body = shift || "";
-  print "Checking for $header...";
+  print "Checking for $header... ";
   my $src = <<C
   #include <stdlib.h>
   $body
@@ -111,5 +138,8 @@ CONFIG
 
 check_header "sys/epoll.h";
 check_header "sys/event.h", "", "#include <sys/types.h>";
+
+command "ragel", "--version";
+command "valgrind", "--version";
 
 write_header;

@@ -16,13 +16,12 @@ BINOJBS := src/excom-server/client.c src/excom-client/client.c    \
 
 CFLAGS  += -I$(CURDIR)/lib/toml
 
+DYLIB = so
+
 ifeq ($(OS),Windows_NT)
 	DYLIB = dll
 else
 	UNAME_S := $(shell uname -s)
-	ifeq ($(UNAME_S),Linux)
-		DYLIB = so
-	endif
 	ifeq ($(UNAME_S),Darwin)
 		DYLIB = dylib
 	endif
@@ -71,7 +70,7 @@ inc/excom.h: inc/excom/protocol/packets.def
 inc/excom/protocol/packets.def: scripts/packets.rb scripts/packet_generator.rb
 	ruby scripts/packet_generator.rb scripts/packets.rb inc/excom/protocol/packets.def
 
-%.o: %.c inc/*.h inc/*/*.h inc/*/*/*.h Makefile
+%.o: %.c inc/*.h inc/*/*.h inc/*/*/*.h inc/excom/config.h Makefile
 	$(CC) -o $@ $(CFLAGS) -c $< $(LDFLAGS)
 
 .c.o:
@@ -87,6 +86,9 @@ test/%.out: test/%.test inc/*.h inc/*/*.h inc/*/*/*.h test/utest.h Makefile
 
 get-deps: libsodium.a
 	sudo apt-get install valgrind
+
+inc/excom/config.h: ./configure
+	@./configure
 
 src/excom/excom-client/client.c: src/excom/excom-client/handle_packets.ci
 src/excom/excom-server/client.c: src/excom/excom-server/handle_packets.ci
