@@ -1,8 +1,8 @@
+CURDIR != pwd
+RM ?= rm -f
+SODIUM_VERSION = 0.4.5
 CFLAGS  += -std=c99 -fno-builtin -g3 -Wall -Wextra -fPIC -I$(CURDIR)/inc $(CFLAG)
 LDFLAGS += -L$(CURDIR) -pthread -lexcom -ltoml -lsodium -lm
-RM ?= rm -f
-CURDIR ?= `pwd`
-SODIUM_VERSION = 0.4.5
 
 OBJS := src/excom/server.o src/excom/string.o src/excom/thread.o  \
 	src/excom/factory.o src/excom/event.o src/excom/server/client.o \
