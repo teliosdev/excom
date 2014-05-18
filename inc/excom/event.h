@@ -28,7 +28,7 @@
 #  define EXCOM_EPOLL
 #endif
 
-#ifdef EXCOM_HAS_SYS_EVENT_H
+#ifdef EXCOM_HAVE_SYS_EVENT_H
 #  define EXCOM_KQUEUE
 #endif
 
