@@ -16,6 +16,18 @@ BINOJBS := src/excom-server/client.c src/excom-client/client.c    \
 
 CFLAGS  += -I$(CURDIR)/lib/toml
 
+ifeq ($(OS),Windows_NT)
+	DYLIB = dll
+else
+	UNAME_S := $(shell uname -s)
+	ifeq ($(UNAME_S),Linux)
+		DYLIB = so
+	endif
+	ifeq ($(UNAME_S),Darwin)
+		DYLIB = dylib
+	endif
+endif
+
 .PHONY: default clean test get-deps cdt
 .SUFFIXES: .o .c .out
 
@@ -38,14 +50,14 @@ libsodium-$(SODIUM_VERSION): libsodium-$(SODIUM_VERSION).tar.gz
 libsodium-$(SODIUM_VERSION).tar.gz:
 	curl "https://download.libsodium.org/libsodium/releases/libsodium-$(SODIUM_VERSION).tar.gz" -o libsodium-$(SODIUM_VERSION).tar.gz
 
-libtoml.so:
+libtoml.$(DYLIB):
 	cd $(CURDIR)/lib/toml && autoconf && ./configure CFLAGS=-fPIC && make
-	cp lib/toml/libtoml.so libtoml.so
+	cp lib/toml/libtoml.$(DYLIB) libtoml.$(DYLIB)
 
-excom.out: libsodium.a libexcom.a libtoml.so $(BINOJBS)
+excom.out: libsodium.a libexcom.a libtoml.$(DYLIB) $(BINOJBS)
 	$(CC) -o $@ $(CFLAGS) $(BINOJBS) $(LDFLAGS)
 
-test: libexcom.a $(TESTOBJS)
+test: libexcom.a libtoml.$(DYLIB) libsodium.a $(TESTOBJS)
 	@./test/run_tests ./test
 
 clean:
