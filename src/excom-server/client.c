@@ -100,10 +100,27 @@ void excom_server_client_write(excom_event_t event,
 {
   (void) event;
   (void) client;
+  int err;
 
-  if(client_data && !client_data->disconnected)
+  if(!client_data || client_data->disconnected)
   {
-    excom_buffer_write(&client_data->buf.out, client->event.fd);
+    return;
+  }
+
+  err = excom_buffer_write(&client_data->buf.out,
+                           client->event.fd);
+
+  if((err == EAGAIN || err == EWOULDBLOCK) &&
+     !(event.flags ^ EXCOM_EVENT_WRITE))
+  {
+    event.root->flags |= EXCOM_EVENT_WRITE;
+    excom_event_update(event.base, event.root);
+  }
+  else if(err == 0 &&
+          (event.flags & EXCOM_EVENT_WRITE))
+  {
+    event.root->flags ^= EXCOM_EVENT_WRITE;
+    excom_event_update(event.base, event.root);
   }
 }
 
@@ -260,6 +277,9 @@ static void* worker(void* cl)
           break;
         #undef PACKET
       }
+
+      client->event.flags |= EXCOM_EVENT_WRITE;
+      excom_event_update(client->event.base, &client->event);
 
       packet = client_data->packets;
     }

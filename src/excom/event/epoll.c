@@ -1,12 +1,12 @@
 #include "excom.h"
-#ifdef EXCOM_USE_EPOLL
+#ifdef EXCOM_EPOLL
 
-int excom_event_base_init(excom_event_base_t* base,
+int excom_event_base_epoll_init(excom_event_base_t* base,
   excom_event_runner_t* runner)
 {
   base->loop      = true;
-  base->epollfd   = epoll_create1(0);
-  base->timeout   = 500;
+  base->epollfd   = epoll_create(1);
+  base->timeout   = 5000;
   base->maxevents = 32;
   base->runner    = runner;
 
@@ -18,11 +18,31 @@ int excom_event_base_init(excom_event_base_t* base,
   return 0;
 }
 
-int excom_event_add(excom_event_base_t* base,
+int excom_event_epoll_update(excom_event_base_t* base,
   excom_event_t* event)
 {
   int err;
   struct epoll_event epevent;
+
+  epevent.events   = event->flags;
+  epevent.data.ptr = event;
+
+  err = epoll_ctl(base->epollfd, EPOLL_CTL_MOD, event->fd, &epevent);
+
+  if(err < 0)
+  {
+    excom_return_errno();
+  }
+
+  return 0;
+}
+
+int excom_event_epoll_add(excom_event_base_t* base,
+  excom_event_t* event)
+{
+  int err;
+  struct epoll_event epevent;
+  event->base = base;
 
   epevent.events  = event->flags;
   epevent.data.ptr = event;
@@ -37,7 +57,7 @@ int excom_event_add(excom_event_base_t* base,
   return 0;
 }
 
-int excom_event_remove(excom_event_base_t* base,
+int excom_event_epoll_remove(excom_event_base_t* base,
   excom_event_t* event)
 {
   int err;
@@ -54,7 +74,7 @@ int excom_event_remove(excom_event_base_t* base,
   return 0;
 }
 
-void excom_event_loop(excom_event_base_t* base, void* ptr)
+void excom_event_epoll_loop(excom_event_base_t* base, void* ptr)
 {
   //struct epoll_event* events;
   excom_event_t event, *eptr;
@@ -84,7 +104,7 @@ void excom_event_loop(excom_event_base_t* base, void* ptr)
   }
 }
 
-void excom_event_loop_end(excom_event_base_t* base)
+void excom_event_epoll_loop_end(excom_event_base_t* base)
 {
   base->loop = false;
 }

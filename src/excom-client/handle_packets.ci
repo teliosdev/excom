@@ -20,7 +20,6 @@ int excom_mutex_islocked(excom_mutex_t*);
     ##__VA_ARGS__);                   \
   excom_protocol_write_packet(&_temp, \
     &data->buf.out, &data->keys);     \
-  printf("writing packet %s\n", #t);  \
 } while(0)
 
 #define error(reason) send(error, EXCOM_ERROR_##reason)
@@ -34,7 +33,6 @@ int excom_mutex_islocked(excom_mutex_t*);
 
 handle(ok, {
   excom_string_t pkey;
-  printf("recieved ok packet\n");
 
   if(data->state == EXCOM_PROTOCOL_STATE_PREHANDSHAKE)
   {

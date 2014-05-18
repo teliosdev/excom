@@ -13,11 +13,10 @@ void excom_client_handle_packets(excom_client_t* client,
 {
   int err;
 
-  excom_event_t event;
-
-  event.fd = client->sock;
-  event.data = NULL;
-  event.flags = EXCOM_EVENT_ALL;
+  client->event.fd = client->sock;
+  client->event.data = NULL;
+  client->event.flags = EXCOM_EVENT_READ | EXCOM_EVENT_CLOSE |
+    EXCOM_EVENT_ERROR;
 
   if(handler)
   {
@@ -30,7 +29,7 @@ void excom_client_handle_packets(excom_client_t* client,
 
   err = excom_event_base_init(&client->base, event_listener);
   check_error;
-  err = excom_event_add(&client->base, &event);
+  err = excom_event_add(&client->base, &client->event);
   check_error;
   err = excom_thread_init(&client->thread, event_loop,
     client);
@@ -54,12 +53,15 @@ static void default_handler(excom_packet_t* packet,
 #   include "excom/protocol/packets.def"
     case packet(INVALID):
     default:
-      printf("[excom-server] Recieved invalid packet type %d!\n",
+      printf("[excom-client] Recieved invalid packet type %d!\n",
         packet->type);
     break;
   }
-
 # undef PACKET
+
+  cl->event.flags |= EXCOM_EVENT_WRITE;
+  excom_event_update(&cl->base, &cl->event);
+
 }
 
 static void* event_loop(void* cl)
@@ -119,8 +121,22 @@ static void clwrite(excom_event_t event,
   excom_client_t* client)
 {
   (void) event;
+  int err;
 
-  excom_buffer_write(&client->buf.out, client->sock);
+  err = excom_buffer_write(&client->buf.out, client->sock);
+
+  if((err == EAGAIN || err == EWOULDBLOCK) &&
+     !(event.flags & EXCOM_EVENT_WRITE))
+  {
+    event.root->flags |= EXCOM_EVENT_WRITE;
+    excom_event_update(event.base, event.root);
+  }
+  else if(err == 0 &&
+          (event.flags & EXCOM_EVENT_WRITE))
+  {
+    event.root->flags ^= EXCOM_EVENT_WRITE;
+    excom_event_update(event.base, event.root);
+  }
 }
 
 
@@ -201,10 +217,12 @@ static void event_listener(excom_event_t event, void* ptr)
   {
     printf("EXCOM EVENT READ\n");
     clread(event, client);
+    clwrite(event, client);
   }
 
   if(event.flags & EXCOM_EVENT_WRITE)
   {
+    printf("EXCOM EVENT WRITE\n");
     clwrite(event, client);
   }
 

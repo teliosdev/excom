@@ -1,7 +1,7 @@
 #include "excom.h"
-#ifdef EXCOM_USE_KQUEUE
+#ifdef EXCOM_KQUEUE
 
-int excom_event_base_init(struct excom_event_base* base,
+int excom_event_base_kqueue_init(struct excom_event_base* base,
   excom_event_runner_t* runner)
 {
   int err = 0;
@@ -9,7 +9,7 @@ int excom_event_base_init(struct excom_event_base* base,
   base->kqueuefd = kqueue();
   base->runner   = runner;
   base->maxevents = 32;
-  base->timeout   = 500;
+  base->timeout   = 5000;
 
   if(base->kqueuefd == -1)
   {
@@ -20,12 +20,19 @@ int excom_event_base_init(struct excom_event_base* base,
   return err;
 }
 
-int excom_event_add(struct excom_event_base* base,
+int excom_event_kqueue_update(struct excom_event_base* base,
+  excom_event_t* event)
+{
+  return excom_event_kqueue_add(base, event);
+}
+
+int excom_event_kqueue_add(struct excom_event_base* base,
   excom_event_t* event)
 {
   int ret;
   short filter = 0;
   excom_kevent_t kev;
+  event->base = base;
 
   if(event->flags & (EXCOM_EVENT_READ | EXCOM_EVENT_ERROR |
     EXCOM_EVENT_CLOSE))
@@ -48,7 +55,7 @@ int excom_event_add(struct excom_event_base* base,
   return 0;
 }
 
-int excom_event_remove(excom_event_base_t* base,
+int excom_event_kqueue_remove(excom_event_base_t* base,
   excom_event_t* event)
 {
   int ret;
@@ -66,7 +73,7 @@ int excom_event_remove(excom_event_base_t* base,
   return 0;
 }
 
-void excom_event_loop(struct excom_event_base* base, void* ptr)
+void excom_event_kqueue_loop(struct excom_event_base* base, void* ptr)
 {
   //excom_kevent_t* events;
   excom_event_t event, *eptr;
@@ -129,7 +136,7 @@ void excom_event_loop(struct excom_event_base* base, void* ptr)
 #undef curev
 }
 
-void excom_event_loop_end(struct excom_event_base* base)
+void excom_event_kqueue_loop_end(struct excom_event_base* base)
 {
   base->loop = false;
 }

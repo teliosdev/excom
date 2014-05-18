@@ -48,7 +48,6 @@ int main(int argc, char* argv[])
   (void) argc;
   (void) argv;
   srv = 0;
-  excom_packet_t p;
 
   if(argc != 2)
   {
@@ -57,10 +56,6 @@ int main(int argc, char* argv[])
   else if(strcmp("server", argv[1]) == 0)
   {
     srv = 1;
-  }
-  else if(strcmp("test", argv[1]) == 0)
-  {
-    srv = 2;
   }
 
   excom_thread_load();
@@ -76,21 +71,6 @@ int main(int argc, char* argv[])
     excom_server_run(&server);
     printf("[excom-cli/server] destroying server\n");
     excom_server_destroy(&server);
-  }
-  else if(srv == 2)
-  {
-    printf("[excom-cli/client-test] init\n");
-    excom_client_init(&client);
-    printf("[excom-cli/client-test] connect\n");
-    assert(excom_client_connect(&client) == 0);
-    printf("[excom-cli/client-test] packet\n");
-    p.type = packet(ping);
-    p.id = 0;
-    excom_protocol_prefill(&p);
-    excom_protocol_write_packet(&p, &client.buf.out, &client.keys);
-    printf("[excom-cli/client-test] handling packets\n");
-    excom_client_handle_packets(&client, NULL);
-    excom_thread_join(&client.thread, NULL);
   }
   else
   {

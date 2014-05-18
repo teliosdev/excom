@@ -98,6 +98,9 @@ int excom_client_connect(excom_client_t* client)
   err = excom_buffer_init(&client->buf.out, 32);
   error;
 
+  client->buf.in.freeable  = false;
+  client->buf.out.freeable = false;
+
   excom_string_init(&str);
   excom_string_fill(&str, sizeof(EXCOM_VERSION), EXCOM_VERSION);
   version.type = packet(protocol_version);
@@ -105,7 +108,6 @@ int excom_client_connect(excom_client_t* client)
     EXCOM_VERSION_MINOR, EXCOM_VERSION_PATCH);
   version.id = 1;
 
-  printf("writing...\n");
   excom_protocol_write_packet(&version, &client->buf.out, &client->keys);
   excom_buffer_write(&client->buf.out, client->sock);
 

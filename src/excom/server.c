@@ -113,7 +113,7 @@ static void _accept(excom_event_t event, excom_server_t* server)
     client->server = server;
 
     client->event.fd    = err;
-    client->event.flags = EXCOM_EVENT_READ | EXCOM_EVENT_WRITE |
+    client->event.flags = EXCOM_EVENT_READ |
       EXCOM_EVENT_ERROR | EXCOM_EVENT_CLOSE;
     client->event.data  = client;
     client->_prev       = server->clients;
@@ -201,10 +201,12 @@ static void on_event(excom_event_t event, void* ptr)
     }
     if(event.flags & EXCOM_EVENT_WRITE)
     {
+      printf("EXCOM EVENT WRITE\n");
       excom_server_client_write(event, event.data);
     }
     if(event.flags & EXCOM_EVENT_ERROR)
     {
+      printf("EXCOM EVENT ERROR\n");
       excom_server_client_error(event, event.data);
     }
     if(event.flags & EXCOM_EVENT_CLOSE)
@@ -251,7 +253,6 @@ void excom_server_destroy(excom_server_t* server)
     .fd     = server->sock,
     .flags  = EXCOM_EVENT_CLOSE,
     .data   = NULL,
-    ._bdata = NULL,
     .root   = NULL
   };
 

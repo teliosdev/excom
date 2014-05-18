@@ -1,5 +1,7 @@
 #include "excom.h"
 #include <ctype.h>
+#include <alloca.h>
+#include <execinfo.h>
 
 
 int excom_buffer_init(excom_buffer_t* buffer, size_t start)
@@ -58,6 +60,11 @@ int excom_buffer_resize(excom_buffer_t* buffer, size_t to_fit)
   uint8_t* new_buf;
   uint32_t distance;
 
+  if(buffer->max == 0)
+  {
+    new_size = 1;
+  }
+
   do {
     new_size *= 2;
   } while(new_size < to_fit);
@@ -107,7 +114,6 @@ int excom_buffer_cappend(excom_buffer_t* buffer, const char* str, size_t size)
   buffer->used += size;
 
   excom_mutex_unlock(&buffer->mutex);
-
   return 0;
 }
 

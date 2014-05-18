@@ -93,7 +93,7 @@ int excom_protocol_write_packet(excom_packet_t* packet,
   excom_buffer_init(&_buf, 32);
   excom_buffer_init(&_buf2, 32);
   uint32_t size = 0;
-  uint16_t type = (uint16_t) packet->type;
+
 
 # define PACKET(name, id, body) case packet(name): {    \
     excom_protocol_##name##_t pack = packet->data.name; \
@@ -144,7 +144,7 @@ int excom_protocol_write_packet(excom_packet_t* packet,
   excom_buffer_cappend(out, buf, 4);
   excom_protocol_pack_uint16_t(buf, packet->id);
   excom_buffer_cappend(out, buf, 2);
-  excom_protocol_pack_uint16_t(buf, type);
+  excom_protocol_pack_uint16_t(buf, packet->type);
   excom_buffer_cappend(out, buf, 2);
 
   if(enc && enc->remote.active)

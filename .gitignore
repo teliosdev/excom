@@ -29,3 +29,4 @@ lib/sodium
 libsodium*
 inc/sodium.h
 inc/sodium
+doc

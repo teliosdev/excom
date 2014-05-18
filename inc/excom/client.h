@@ -11,6 +11,7 @@ typedef struct excom_client {
   excom_encrypt_pair_t enc;
   excom_encrypt_t keys;
   excom_event_base_t base;
+  excom_event_t event;
   excom_thread_t thread;
   excom_mutex_t mutex;
   excom_packet_t* packets;

@@ -60,7 +60,7 @@ typedef struct excom_server
    */
   uint32_t addr;
 
-  struct excom_event_base base;
+  excom_event_base_t base;
 
   excom_encrypt_pair_t enc;
   struct excom_server_client* clients;

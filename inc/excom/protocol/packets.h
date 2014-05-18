@@ -6,6 +6,9 @@
 
 #define string(name) excom_string_t name;
 #define number(type, name) type name;
+#define enum(type, name) type name;
+#define sarray(type, name) type* name;
+#define parray(type, name) type** name;
 
 #include "./packets.def"
 

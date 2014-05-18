@@ -48,7 +48,7 @@ test: libexcom.a $(TESTOBJS)
 	@./test/run_tests ./test
 
 clean:
-	$(RM) -r $(OBJS) $(TESTOBJS) libexcom.a excom
+	$(RM) -r $(OBJS) $(TESTOBJS) libexcom.a excom excom.out
 
 clean-sodium:
 	$(RM) -r libsodium-$(SODIUM_VERSION) libsodium-$(SODIUM_VERSION).tar.gz libsodium.a inc/sodium{,.h}
