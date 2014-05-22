@@ -5,11 +5,11 @@ int excom_event_base_kqueue_init(excom_event_base_kqueue_t* base,
   excom_event_runner_t* runner)
 {
   int err = 0;
-  base->loop     = true;
-  base->kqueuefd = kqueue();
-  base->runner   = runner;
+  base->loop      = true;
+  base->kqueuefd  = kqueue();
+  base->runner    = runner;
   base->maxevents = 32;
-  base->timeout   = 5000;
+  base->timeout   = 500;
 
   if(base->kqueuefd == -1)
   {

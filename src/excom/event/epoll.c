@@ -6,7 +6,7 @@ int excom_event_base_epoll_init(excom_event_base_epoll_t* base,
 {
   base->loop      = true;
   base->epollfd   = epoll_create(1);
-  base->timeout   = 5000;
+  base->timeout   = 500;
   base->maxevents = 32;
   base->runner    = runner;
 

@@ -9,13 +9,13 @@ int excom_event_base_poll_init(excom_event_base_poll_t* base,
   excom_event_runner_t* runner)
 {
   int err;
-  base->loop   = true;
-  base->fds    = excom_malloc(POLL_SIZE  * EXCOM_POLL_INITIAL_SIZE);
-  base->events = excom_malloc(EVENT_SIZE * EXCOM_POLL_INITIAL_SIZE);
-  base->nfds   = 0;
-  base->max    = EXCOM_POLL_INITIAL_SIZE;
-  base->runner = runner;
-  base->timeout   = 5000;
+  base->loop    = true;
+  base->fds     = excom_malloc(POLL_SIZE  * EXCOM_POLL_INITIAL_SIZE);
+  base->events  = excom_malloc(EVENT_SIZE * EXCOM_POLL_INITIAL_SIZE);
+  base->nfds    = 0;
+  base->max     = EXCOM_POLL_INITIAL_SIZE;
+  base->runner  = runner;
+  base->timeout = 500;
 
   err = excom_mutex_init(&base->mutex);
   if(err) { return err; }

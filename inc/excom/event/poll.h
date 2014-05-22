@@ -39,6 +39,6 @@ void excom_event_poll_loop_end(excom_event_base_t* base);
 #define excom_event_update excom_event_poll_update
 #define excom_event_remove excom_event_poll_remove
 #define excom_event_loop excom_event_poll_loop
-#define excom_event_loop_end excom_event_poll_loop
+#define excom_event_loop_end excom_event_poll_loop_end
 
 #endif
