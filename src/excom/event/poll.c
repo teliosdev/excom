@@ -4,6 +4,7 @@
 
 #define POLL_SIZE sizeof(struct pollfd)
 #define EVENT_SIZE sizeof(struct excom_event*)
+#
 
 int excom_event_base_poll_init(excom_event_base_poll_t* base,
   excom_event_runner_t* runner)
@@ -21,7 +22,7 @@ int excom_event_base_poll_init(excom_event_base_poll_t* base,
   excom_check_alloc(base->events);
   err = excom_mutex_init(&base->mutex);
   if(err) { return err; }
-  return base->fds == NULL;
+  return 0;
 }
 
 int excom_event_base_poll_destroy(excom_event_base_poll_t* base)

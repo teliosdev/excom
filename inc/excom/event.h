@@ -10,6 +10,7 @@
  *
  *     kqueue epoll
  *     poll
+ *     select
  *
  * Assuming all of the above are implemented.  Excom makes
  * sure that only one implementation is used.  Otherwise, it will
@@ -110,7 +111,8 @@ typedef void (excom_event_runner_t)(excom_event_t, void*);
 #  define EXCOM_USE_POLL
 #  include "excom/event/poll.h"
 #else
-# error No suitable platform event keeper.
+#  define EXCOM_USE_SELECT
+#  include "excom/event/select.h"
 #endif
 
 /*

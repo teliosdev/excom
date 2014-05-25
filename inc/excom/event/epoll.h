@@ -22,6 +22,7 @@ typedef struct excom_event_base_epoll
 
 int excom_event_base_epoll_init(excom_event_base_t* base,
   excom_event_runner_t* runner);
+int excom_event_base_epoll_destroy(excom_event_base_t* base);
 int excom_event_epoll_add(excom_event_base_t* base,
   struct excom_event* event);
 int excom_event_epoll_update(excom_event_base_t* base,
@@ -32,6 +33,7 @@ void excom_event_epoll_loop(excom_event_base_t* base, void* ptr);
 void excom_event_epoll_loop_end(excom_event_base_t* base);
 
 #define excom_event_base_init excom_event_base_epoll_init
+#define excom_event_base_destroy excom_event_base_epoll_destroy
 #define excom_event_add excom_event_epoll_add
 #define excom_event_update excom_event_epoll_update
 #define excom_event_remove excom_event_epoll_remove

@@ -6,6 +6,7 @@
 #undef excom_event_base
 #undef excom_event_base_t
 #undef excom_event_base_init
+#undef excom_event_base_destroy
 #undef excom_event_add
 #undef excom_event_update
 #undef excom_event_remove

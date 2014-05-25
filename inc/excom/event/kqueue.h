@@ -20,7 +20,7 @@ typedef struct excom_event_base_kqueue
   bool loop;
   int kqueuefd;
 
-  int timeout;
+  uint32_t timeout;
   int maxevents;
 
   excom_event_runner_t* runner;
@@ -36,6 +36,7 @@ typedef struct excom_event_base_kqueue
 
 int excom_event_base_kqueue_init(excom_event_base_t* base,
   excom_event_runner_t* runner);
+int excom_event_base_kqueue_destroy(excom_event_base_t* base);
 int excom_event_kqueue_add(excom_event_base_t* base,
   struct excom_event* event);
 int excom_event_kqueue_update(excom_event_base_t* base,
@@ -46,6 +47,7 @@ void excom_event_kqueue_loop(excom_event_base_t* base, void* ptr);
 void excom_event_kqueue_loop_end(excom_event_base_t* base);
 
 #define excom_event_base_init excom_event_base_kqueue_init
+#define excom_event_base_destroy excom_event_base_kqueue_destroy
 #define excom_event_add excom_event_kqueue_add
 #define excom_event_update excom_event_kqueue_update
 #define excom_event_remove excom_event_kqueue_remove
