@@ -9,9 +9,7 @@
  * The solutions that are on the same level recieve the same priority.
  *
  *     kqueue epoll
- *     /dev/poll
  *     poll
- *     select
  *
  * Assuming all of the above are implemented.  Excom makes
  * sure that only one implementation is used.  Otherwise, it will
@@ -20,7 +18,6 @@
 
 #undef EXCOM_USE_EPOLL
 #undef EXCOM_USE_KQUEUE
-#undef EXCOM_USE_DEV_POLL
 #undef EXCOM_USE_POLL
 #undef EXCOM_USE_SELECT
 
@@ -99,14 +96,21 @@ typedef void (excom_event_runner_t)(excom_event_t, void*);
 #  define EXCOM_USE_KQUEUE
 #  include "excom/event/kqueue.h"
 #elif defined(EXCOM_DEV_POLL)
-#  define EXCOM_USE_DEV_POLL
-#  include "excom/event/dev_poll.h"
-#elif defined(EXCOM_POLL)
+// Unforunately, /dev/poll won't be used.  It would require O(n^2)
+// search time to find a excom_event corresponding to the triggered
+// event, which is exactly what we don't want.  The O(n^2) time
+// results from the fact that for every triggered event, all
+// registered events must be looked through to find the corresponding
+// excom_event.  Poll has the issue of looping through all events
+// already to find the ones that were triggered (resulting in O(n)
+// time).
+//
+// Blame `struct pollfd` for not containing a user data field.
+#elif defined(EXCOM_POLL) || defined(EXCOM_HAVE_POLL_H)
 #  define EXCOM_USE_POLL
 #  include "excom/event/poll.h"
 #else
-#  define EXCOM_USE_SELECT
-#  include "excom/event/select.h"
+# error No suitable platform event keeper.
 #endif
 
 /*

@@ -6,3 +6,8 @@ port = 5656
   [server.keys]
   public = "id_server.pub"
   private = "id_server"
+
+  [[server.channels]]
+  name   = "home"
+  admins = "fingerprint here"
+  hidden = true

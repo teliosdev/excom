@@ -138,6 +138,7 @@ CONFIG
 
 check_header "sys/epoll.h";
 check_header "sys/event.h", "", "#include <sys/types.h>";
+check_header "poll.h";
 
 command "ragel", "--version";
 command "valgrind", "--version";

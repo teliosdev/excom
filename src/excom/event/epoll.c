@@ -10,7 +10,7 @@ int excom_event_base_epoll_init(excom_event_base_epoll_t* base,
   base->maxevents = 32;
   base->runner    = runner;
 
-  if(base->epollfd < 0)
+  if(base->epollfd < 1)
   {
     excom_return_errno();
   }

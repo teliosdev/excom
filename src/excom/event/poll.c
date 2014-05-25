@@ -17,6 +17,8 @@ int excom_event_base_poll_init(excom_event_base_poll_t* base,
   base->runner  = runner;
   base->timeout = 500;
 
+  excom_check_alloc(base->fds);
+  excom_check_alloc(base->events);
   err = excom_mutex_init(&base->mutex);
   if(err) { return err; }
   return base->fds == NULL;
@@ -26,9 +28,12 @@ int excom_event_base_poll_destroy(excom_event_base_poll_t* base)
 {
   base->loop = false;
   excom_free(base->fds);
+  excom_free(base->events);
   base->nfds = 0;
   base->max  = 0;
   base->runner = NULL;
+  base->fds = NULL;
+  base->events = NULL;
   return 0;
 }
 
@@ -56,14 +61,9 @@ int excom_event_poll_add(excom_event_base_poll_t* base,
     base->max *= 2;
     base->fds    = excom_realloc(base->fds, POLL_SIZE * base->max);
     base->events = excom_realloc(base->events, EVENT_SIZE * base->max);
-  }
 
-  if(base->fds == NULL || base->events == NULL)
-  {
-    if(base->fds) { excom_free(base->fds); }
-    if(base->events) { excom_free(base->events); }
-
-    return ENOMEM;
+    excom_check_alloc(base->fds);
+    excom_check_alloc(base->events);
   }
 
   event->base = base;
@@ -105,13 +105,8 @@ int excom_event_poll_remove(excom_event_base_poll_t* base,
     base->max /= 2;
     base->fds    = excom_realloc(base->fds, POLL_SIZE * base->max);
     base->events = excom_realloc(base->events, EVENT_SIZE * base->max);
-  }
-
-  if(base->fds == NULL || base->events == NULL)
-  {
-    if(base->fds) { excom_free(base->fds); }
-    if(base->events) { excom_free(base->events); }
-    return ENOMEM;
+    excom_check_alloc(base->fds);
+    excom_check_alloc(base->events);
   }
 
   return 0;

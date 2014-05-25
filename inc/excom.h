@@ -85,4 +85,6 @@
   return err;                     \
 } while(0)
 
+#define excom_check_alloc(alloc) if((alloc) == NULL) excom_return_errno()
+
 #endif
