@@ -1,0 +1,16 @@
+[package]
+name = "excom_proto"
+version = "0.1.0"
+authors = ["Jeremy Rodi <me@retroc.at>"]
+edition = "2018"
+
+[dependencies]
+tokio = "0.1"
+serde = "1"
+serde_derive = "1"
+error-chain = "0.12"
+bytes = "0.4"
+serde_cbor = "0.9"
+tokio-tls = "0.2"
+native-tls = "0.2"
+log = "0.4"

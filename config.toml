@@ -1,0 +1,6 @@
+[server]
+address = "127.0.0.1:4209"
+
+[server.tls]
+file = "test.p12"
+pass = "test"

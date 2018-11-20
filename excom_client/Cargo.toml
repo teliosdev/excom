@@ -1,0 +1,18 @@
+[package]
+name = "excom_client"
+version = "0.1.0"
+authors = ["Jeremy Rodi <me@retroc.at>"]
+edition = "2018"
+
+[dependencies]
+error-chain = "0.12"
+tokio = "0.1"
+serde = "1"
+serde_derive = "1"
+excom_proto = { path = "../excom_proto" }
+tokio-tls = "0.2"
+futures = "0.1"
+log = "0.4"
+env_logger = "0.5.13"
+regex = "1"
+lazy_static = "1"

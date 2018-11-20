@@ -1,0 +1,2 @@
+[workspace]
+members = ["excom_proto", "excom_server", "excom_client", "excom_proto2"]
